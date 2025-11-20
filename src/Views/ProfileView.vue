@@ -113,7 +113,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import avatar1 from '@/assets/avatars/avatar1.svg'
+import avatar1 from '@/assets/s'
 import avatar2 from '@/assets/avatars/avatar2.svg'
 import avatar3 from '@/assets/avatars/avatar3.svg'
 import avatar4 from '@/assets/avatars/avatar4.svg'
@@ -121,19 +121,19 @@ import avatar5 from '@/assets/avatars/avatar5.svg'
 
 const user = {
     name: 'Ng Thi Luong Hau',
-    title: 'Frontend Developer',
     avatar: avatar1,
     cover: 'https://picsum.photos/1200/300?blur=2',
     location: 'Ha Noi City, Vietnam',
-    work: 'FPT Software',
+    work: 'FPT Sofware',
     education: 'FPT University'
 }
 
 const friends = [
-    { id: 1, name: 'Mai', avatar: avatar2 },
-    { id: 2, name: 'Huy', avatar: avatar3 },
-    { id: 3, name: 'Linh', avatar: avatar4 },
-    { id: 4, name: 'Tuan', avatar: avatar5 }
+    { id: 1, name: 'Mai', avatar: avatar1 },
+    { id: 2, name: 'Huy', avatar: avatar2 },
+    { id: 3, name: 'Linh', avatar: avatar3 },
+    { id: 4, name: 'Tuan', avatar: avatar4 },
+    { id: 5, name: 'Hoa', avatar: avatar5 },
 ]
 
 const photos = [
