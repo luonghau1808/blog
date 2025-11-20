@@ -113,11 +113,11 @@
 
 <script setup>
 import { ref } from 'vue'
-import avatar1 from '@/assets/s'
-import avatar2 from '@/assets/avatars/avatar2.svg'
-import avatar3 from '@/assets/avatars/avatar3.svg'
-import avatar4 from '@/assets/avatars/avatar4.svg'
-import avatar5 from '@/assets/avatars/avatar5.svg'
+import avatar1 from '../assets/img01.jpg'
+import avatar2 from '../assets/img01.jpg'
+import avatar3 from '../assets/img01.jpg'
+import avatar4 from '../assets/img01.jpg'
+import avatar5 from '../assets/img01.jpg'
 
 const user = {
     name: 'Ng Thi Luong Hau',
