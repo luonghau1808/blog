@@ -23,7 +23,7 @@
                     <button class="btn btn-link p-0" title="Activity">
                     </button>
                     <div class="rounded-circle overflow-hidden" style="width:32px;height:32px;">
-                        <img :src="avatar5" class="w-100 h-100 object-fit-cover" alt="avatar" />
+                        <img :src="avatars[4]" class="w-100 h-100 object-fit-cover" alt="avatar" />
                     </div>
                 </div>
             </div>
@@ -127,7 +127,7 @@
 
                         <!-- Post image -->
                         <div class="post-image">
-                            <img :src="post.image" class="w-100" alt="post image" />
+                            <img :src="getAssetUrl(post.image)" class="w-100" alt="post image" />
                         </div>
 
                         <!-- Actions -->
@@ -140,10 +140,7 @@
                                 </button>
 
                                 <div class="d-flex flex-column align-items-center">
-                                    <button class="btn btn-link p-0 mb-1" @click="toggleSave(post.id)" :title="savedHas(post.id) ? 'Đã lưu' : 'Lưu'">
-                                        <svg v-if="!savedHas(post.id)" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-                                        <svg v-else width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-                                    </button>
+                                    
 
                                     <button class="btn btn-link p-0 d-flex align-items-center" title="Bình luận">
                                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
@@ -188,7 +185,7 @@
                 <div class="col-3 col-md-3 d-none d-md-block">
                     <div class="bg-white p-3 rounded border mb-3 d-flex align-items-center">
                         <div class="rounded-circle overflow-hidden me-3" style="width:56px;height:56px;">
-                            <img :src="avatar6" class="w-100 h-100 object-fit-cover" />
+                            <img :src="avatars[5]" class="w-100 h-100 object-fit-cover" />
                         </div>
                         <div>
                             <div class="fw-bold">hauntl_18</div>
@@ -229,22 +226,24 @@
 <script setup>
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import avatar1 from '../assets/img01.jpg'
-import avatar2 from '../assets/img01.jpg'
-import avatar3 from '../assets/img01.jpg'
-import avatar4 from '../assets/img01.jpg'
-import avatar5 from '../assets/img01.jpg'
-import avatar6 from '../assets/img01.jpg'
+// build a map of files in src/assets so we can resolve by filename at runtime
+const __assetModules = import.meta.glob('../assets/**', { eager: true, as: 'url' })
+const assetMap = {}
+for (const key in __assetModules) {
+    const parts = key.split('/')
+    const name = parts[parts.length - 1]
+    assetMap[name] = __assetModules[key]
+}
 
-const avatars = [avatar1, avatar2, avatar3, avatar4, avatar5, avatar6]
+const avatars = [assetMap['img01.jpg'], assetMap['img01.jpg'], assetMap['img01.jpg'], assetMap['img01.jpg'], assetMap['img01.jpg'], assetMap['img01.jpg']]
 
 const posts = reactive([
     {
         id: 1,
         user: 'nguyenvan',
-        avatar: avatar1,
+        avatar: avatars[0],
         location: 'Hanoi, Vietnam',
-        image: 'https://picsum.photos/900/900?random=11',
+        image: 'img01.jpg',
         likes: 123,
         caption: 'Một ngày đẹp trời!',
         commentsList: [
@@ -255,9 +254,9 @@ const posts = reactive([
     {
         id: 2,
         user: 'phamthi',
-        avatar: avatar2,
+        avatar: avatars[1],
         location: 'Da Nang',
-        image: 'https://picsum.photos/900/900?random=22',
+        image: 'photo2.svg',
         likes: 58,
         caption: 'Cuộc sống là những chuyến đi',
         commentsList: [
@@ -346,6 +345,23 @@ function addCommentToPost(postId) {
 
     // clear input
     newComments[postId] = ''
+}
+
+// Resolve image path: if it's an external URL, return as-is.
+// If it's a filename located in `src/assets`, call with the filename (e.g. 'photo1.jpg')
+function getAssetUrl(path) {
+    if (!path) return ''
+    if (typeof path !== 'string') return ''
+    if (path.startsWith('http') || path.startsWith('//')) return path
+    if (path.startsWith('/')) return path
+    // If the user provided a filename that exists in src/assets, return it
+    if (assetMap[path]) return assetMap[path]
+    // try to resolve with new URL as a last resort
+    try {
+        return new URL(`../assets/${path}`, import.meta.url).href
+    } catch {
+        return path
+    }
 }
 </script>
 

@@ -5,11 +5,11 @@
                 <div class="card overflow-hidden d-flex flex-row post-card">
                     <!-- Left: Image / Carousel -->
                     <div class="post-images d-flex align-items-center justify-content-center">
-                        <img
-                            :src="currentImage"
-                            class="img-fluid"
-                            alt="Post image"
-                        />
+                            <img
+                                :src="getAssetUrl(currentImage)"
+                                class="img-fluid"
+                                alt="Post image"
+                            />
                         <button v-if="post.images.length > 1" class="carousel-control-prev" @click="prevImage" aria-label="Previous">
                             ‹
                         </button>
@@ -100,7 +100,16 @@
 </template>
 
 <script>
-import avatar1 from '@/assets/avatars/avatar1.svg'
+// build asset map for src/assets
+const __assetModules = import.meta.glob('../assets/**', { eager: true, as: 'url' })
+const assetMap = {}
+for (const key in __assetModules) {
+    const parts = key.split('/')
+    const name = parts[parts.length - 1]
+    assetMap[name] = __assetModules[key]
+}
+
+import avatar1 from '@/assets/img01.jpg'
 
 export default {
     name: "PostView",
@@ -113,9 +122,8 @@ export default {
                     avatar: avatar1,
                 },
                 images: [
-                    "https://via.placeholder.com/800x800?text=Image+1",
-                    "https://via.placeholder.com/800x800?text=Image+2",
-                    "https://via.placeholder.com/800x800?text=Image+3",
+                    'photo1.svg',
+                    'photo2.svg'
                 ],
                 location: "Hanoi, Vietnam",
                 caption: "Một ngày đẹp trời!",
@@ -183,6 +191,15 @@ export default {
         focusComment() {
             this.$refs.commentInput && this.$refs.commentInput.focus();
         },
+        // Resolve image path: supports external URLs, absolute paths, or filenames in src/assets
+        getAssetUrl(path) {
+            if (!path) return ''
+            if (typeof path !== 'string') return ''
+            if (path.startsWith('http') || path.startsWith('//')) return path
+            if (path.startsWith('/')) return path
+            if (assetMap[path]) return assetMap[path]
+            try { return new URL(`../assets/${path}`, import.meta.url).href } catch { return path }
+        }
     },
 };
 </script>

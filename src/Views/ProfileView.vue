@@ -9,8 +9,8 @@
                         <div class="avatar-wrap">
                             <img :src="user.avatar" alt="avatar" class="avatar img-thumbnail" />
                         </div>
-                        <div class="ms-3 flex-grow-1">
-                            <h3 class="mb-0">{{ user.name }}</h3>
+                        <div class="ms-3 flex-grow-1 mt-2 ">
+                            <h3 class="mb-2">{{ user.name }}</h3>
                             <p class="text-muted mb-1">{{ user.title }}</p>
                             <div>
                                 <button class="btn btn-primary btn-sm me-2">Chỉnh sửa trang cá nhân</button>
@@ -60,7 +60,7 @@
                                 </div>
                             </div>
                             <p class="mb-2">{{ post.text }}</p>
-                            <img v-if="post.image" :src="post.image" class="img-fluid rounded mb-2" />
+                            <img :src="post.image" class="img-fluid rounded mb-2" />
                             <div class="d-flex justify-content-between small text-muted">
                                 <div>{{ post.likes }} Like</div>
                                 <div>{{ post.comments.length }} Bình luận</div>
@@ -122,7 +122,7 @@ import avatar5 from '../assets/img01.jpg'
 const user = {
     name: 'Ng Thi Luong Hau',
     avatar: avatar1,
-    cover: 'https://picsum.photos/1200/300?blur=2',
+    cover: '../assets/img01.jpg',
     location: 'Ha Noi City, Vietnam',
     work: 'FPT Sofware',
     education: 'FPT University'
@@ -151,7 +151,7 @@ const posts = ref([
         user: { name: user.name, avatar: user.avatar },
         time: '2 hrs',
         text: 'Chia sẻ suy nghĩ mới hôm nay!',
-        image: 'https://picsum.photos/800/400?random=1',
+        image: '@/assets/img01.jpg',
         likes: 12,
         liked: false,
         comments: []

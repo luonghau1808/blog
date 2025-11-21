@@ -12,7 +12,7 @@
                     <div class="card shadow-sm rounded-3">
                         <div class="card-body p-4">
                             <div class="text-center mb-3">
-                                <img src="../assets/
+                                <img src="../assets/logo.png
                                 " alt="Logo" class="brand-circle mb-2" />
                                 <h5 class="mb-0">Đăng nhập</h5>
                                 <small class="text-muted d-block"></small>
