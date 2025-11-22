@@ -2,13 +2,16 @@
   <div class="composer-overlay">
     <div class="composer-card card shadow-sm">
       <div class="card-body">
+         <h3 class="text-center fw-bold mb-3">Đăng bài viết</h3>
         <div class="d-flex">
           <img :src="userAvatar" class="rounded-circle me-3" style="width:48px;height:48px;object-fit:cover;" />
           <textarea v-model="caption" class="form-control" rows="3" placeholder="Bạn đang nghĩ gì?"></textarea>
         </div>
 
         <div class="d-flex justify-content-between align-items-center mt-3">
+         
           <div class="d-flex gap-2">
+            
             <label class="btn btn-light btn-sm mb-0">
               <input ref="fileInput" type="file" accept="image/*" class="d-none" multiple @change="onFileChange" />
               <i class="bi bi-image"></i> Ảnh/Video

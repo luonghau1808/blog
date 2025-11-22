@@ -41,11 +41,12 @@
                         <div class="card-body">
                             <div class="d-flex">
                                 <img :src="user.avatar" alt="avatar" class="rounded-circle me-2" style="width:48px;height:48px;object-fit:cover"/>
-                                <input v-model="newPost" class="form-control" placeholder="Bạn đang nghĩ gì?" />
-                            </div>
-                            <div class="mt-2 text-end">
+                                <input v-model="newPost" class="form-control m-2" placeholder="Bạn đang nghĩ gì?" />
+                                  <div class="m-2 text-end">
                                 <button class="btn btn-sm btn-primary" @click="addPost">Đăng bài viết</button>
                             </div>
+                            </div>
+                          
                         </div>
                     </div>
 
@@ -142,7 +143,8 @@ const photos = [
     'img03.jpg',
     'img04.jpg',
     'img05.jpg',
-    'img06.jpg',
+    'img06.jpg'
+
 ]
 
 const posts = ref([
@@ -151,7 +153,7 @@ const posts = ref([
         user: { name: user.name, avatar: user.avatar },
         time: '2 hrs',
         text: 'Chia sẻ suy nghĩ mới hôm nay!',
-        image: '@/assets/img01.jpg',
+        image: 'img13.jpg',
         likes: 12,
         liked: false,
         comments: []

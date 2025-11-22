@@ -124,7 +124,7 @@ export default {
             default: () => ({
                 user: {
                     username: "leminh",
-                    avatar: 'img02.jpg',
+                    avatar:'../assets/img01.jpg' ,
                 },
                 images: [
                     'img02.jpg',
@@ -154,7 +154,7 @@ export default {
             localComments: Array.isArray(this.post.comments) ? [...this.post.comments] : []
             ,
             // expose avatars for sidebar usage (pull from assetMap if available)
-            avatars: [assetMap['avatar1.svg'] || '', assetMap['avatar2.svg'] || '', assetMap['avatar3.svg'] || '', assetMap['avatar4.svg'] || '', assetMap['avatar5.svg'] || '', assetMap['avatar6.svg'] || '']
+            avatars: [assetMap['img11.jpg'] || '', assetMap['img11.jpg'] || '', assetMap['img11.jpg'] || '', assetMap['img11.jpg'] || '', assetMap['img11.jpg'] || '', assetMap['img11.jpg'] || '']
         };
     },
     computed: {
