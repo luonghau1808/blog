@@ -31,6 +31,7 @@
 
         <!-- Main content -->
         <div class="container-fluid mt-4">
+            <PostComposer v-if="showComposer" @close="showComposer = false" />
             <div class="row justify-content">
                   <div class="col-3 col-md-2 d-none d-md-block">
                     <aside class="left-sidebar">
@@ -79,7 +80,7 @@
                                 </li>
 
                                 <li class="nav-item mb-2">
-                                    <a class="nav-link d-flex align-items-center p-2" href="#">
+                                    <a class="nav-link d-flex align-items-center p-2" href="#" @click.prevent="showComposer = true">
                                         <span class="me-3 icon">✚</span>
                                         <span>Tạo bài viết</span>
                                     </a>
@@ -126,8 +127,15 @@
                         </div>
 
                         <!-- Post image -->
-                        <div class="post-image">
-                            <img :src="getAssetUrl(post.image)" class="w-100" alt="post image" />
+                        <div class="post-image position-relative">
+                            <img :src="getAssetUrl((post.images && post.images.length) ? post.images[(imageIndex[post.id] || 0)] : post.image)" class="w-100" alt="post image" />
+
+                            <button v-if="post.images && post.images.length > 1" class="carousel-prev" @click="prevImage(post.id)" aria-label="Previous image">‹</button>
+                            <button v-if="post.images && post.images.length > 1" class="carousel-next" @click="nextImage(post.id)" aria-label="Next image">›</button>
+
+                            <div v-if="post.images && post.images.length > 1" class="image-dots">
+                                <span v-for="(img,i) in post.images" :key="i" :class="['dot', { active: i === (imageIndex[post.id] || 0) }]" @click="gotoImage(post.id, i)"></span>
+                            </div>
                         </div>
 
                         <!-- Actions -->
@@ -225,6 +233,7 @@
 
 <script setup>
 import { reactive, ref } from 'vue'
+import PostComposer from '@/components/PostComposer.vue'
 import { useRouter } from 'vue-router'
 // build a map of files in src/assets so we can resolve by filename at runtime
 const __assetModules = import.meta.glob('../assets/**', { eager: true, as: 'url' })
@@ -235,7 +244,7 @@ for (const key in __assetModules) {
     assetMap[name] = __assetModules[key]
 }
 
-const avatars = [assetMap['img01.jpg'], assetMap['img01.jpg'], assetMap['img01.jpg'], assetMap['img01.jpg'], assetMap['img01.jpg'], assetMap['img01.jpg']]
+const avatars = [assetMap['img01.jpg'], assetMap['img23.jpg'], assetMap['img15.jpg'], assetMap['img23.jpg'], assetMap['img05.jpg'], assetMap['img13.jpg']]
 
 const posts = reactive([
     {
@@ -271,6 +280,9 @@ const newComments = reactive({})
 const liked = ref(new Set())
 const saved = ref(new Set())
 const openMenuId = ref(null)
+const showComposer = ref(false)
+// per-post image index map
+const imageIndex = reactive({})
 const router = useRouter()
 
 function toggleLike(id) {
@@ -363,6 +375,26 @@ function getAssetUrl(path) {
         return path
     }
 }
+
+function prevImage(postId) {
+    const p = posts.find(x => x.id === postId)
+    if (!p || !p.images || !p.images.length) return
+    const idx = imageIndex[postId] || 0
+    imageIndex[postId] = (idx + p.images.length - 1) % p.images.length
+}
+
+function nextImage(postId) {
+    const p = posts.find(x => x.id === postId)
+    if (!p || !p.images || !p.images.length) return
+    const idx = imageIndex[postId] || 0
+    imageIndex[postId] = (idx + 1) % p.images.length
+}
+
+function gotoImage(postId, idx) {
+    const p = posts.find(x => x.id === postId)
+    if (!p || !p.images || !p.images.length) return
+    imageIndex[postId] = idx % p.images.length
+}
 </script>
 
 <style scoped>
@@ -390,6 +422,28 @@ function getAssetUrl(path) {
     max-height: 720px;
     object-fit: cover;
 }
+.post-image { position: relative }
+.carousel-prev,
+.carousel-next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0,0,0,0.35);
+    color: #fff;
+    border: none;
+    width: 36px;
+    height: 56px;
+    font-size: 28px;
+    line-height: 56px;
+    text-align: center;
+    cursor: pointer;
+    border-radius: 6px;
+}
+.carousel-prev { left: 8px }
+.carousel-next { right: 8px }
+.image-dots { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); display:flex; gap:6px }
+.dot { width:8px; height:8px; background: rgba(255,255,255,0.5); border-radius:50%; cursor:pointer }
+.dot.active { background:#fff }
 .btn-link { color: inherit; }
 
 /* small label next to action icons */

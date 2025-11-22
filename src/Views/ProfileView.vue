@@ -114,10 +114,11 @@
 <script setup>
 import { ref } from 'vue'
 import avatar1 from '../assets/img01.jpg'
-import avatar2 from '../assets/img01.jpg'
-import avatar3 from '../assets/img01.jpg'
-import avatar4 from '../assets/img01.jpg'
-import avatar5 from '../assets/img01.jpg'
+import avatar2 from '../assets/img02.jpg'
+import avatar3 from '../assets/img03.jpg'
+import avatar4 from '../assets/img04.jpg'
+import avatar5 from '../assets/img05.jpg'
+import avatar6 from '../assets/img17.jpg'
 
 const user = {
     name: 'Ng Thi Luong Hau',
@@ -129,7 +130,7 @@ const user = {
 }
 
 const friends = [
-    { id: 1, name: 'Mai', avatar: avatar1 },
+    { id: 1, name: 'Mai', avatar: avatar6 },
     { id: 2, name: 'Huy', avatar: avatar2 },
     { id: 3, name: 'Linh', avatar: avatar3 },
     { id: 4, name: 'Tuan', avatar: avatar4 },
@@ -137,12 +138,11 @@ const friends = [
 ]
 
 const photos = [
-    'https://picsum.photos/200?1',
-    'https://picsum.photos/200?2',
-    'https://picsum.photos/200?3',
-    'https://picsum.photos/200?4',
-    'https://picsum.photos/200?5',
-    'https://picsum.photos/200?6'
+    'img02.jpg',
+    'img03.jpg',
+    'img04.jpg',
+    'img05.jpg',
+    'img06.jpg',
 ]
 
 const posts = ref([

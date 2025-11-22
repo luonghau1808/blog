@@ -1,102 +1,108 @@
 <template>
-    <div class="post-view container py-4">
-        <div class="row justify-content-center">
-            <div class="col-lg-8">
-                <div class="card overflow-hidden d-flex flex-row post-card">
-                    <!-- Left: Image / Carousel -->
-                    <div class="post-images d-flex align-items-center justify-content-center">
+    <div class="post-view fullscreen">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="card overflow-hidden d-flex flex-row post-card">
+                        <!-- Left: Image / Carousel -->
+                        <div class="post-images d-flex align-items-center justify-content-center">
                             <img
                                 :src="getAssetUrl(currentImage)"
                                 class="img-fluid"
                                 alt="Post image"
                             />
-                        <button v-if="post.images.length > 1" class="carousel-control-prev" @click="prevImage" aria-label="Previous">
-                            ‹
-                        </button>
-                        <button v-if="post.images.length > 1" class="carousel-control-next" @click="nextImage" aria-label="Next">
-                            ›
-                        </button>
-                        <div v-if="post.images.length > 1" class="image-dots">
-                            <span
-                                v-for="(img, i) in post.images"
-                                :key="i"
-                                :class="['dot', { active: i === currentIndex }]"
-                                @click="goTo(i)"
-                            ></span>
-                        </div>
-                    </div>
-
-                    <!-- Right: Details -->
-                    <div class="post-details d-flex flex-column">
-                        <!-- Header -->
-                        <div class="d-flex align-items-center px-3 py-2 border-bottom">
-                            <img :src="post.user.avatar" class="rounded-circle user-avatar" alt="avatar" />
-                            <div class="ms-2">
-                                <div class="username">{{ post.user.username }}</div>
-                                <div class="location text-muted small">{{ post.location }}</div>
-                            </div>
-                            <div class="ms-auto">
-                                <button class="btn btn-sm btn-link text-muted">...</button>
+                            <button v-if="post.images.length > 1" class="carousel-control-prev" @click="prevImage" aria-label="Previous">
+                                ‹
+                            </button>
+                            <button v-if="post.images.length > 1" class="carousel-control-next" @click="nextImage" aria-label="Next">
+                                ›
+                            </button>
+                            <div v-if="post.images.length > 1" class="image-dots">
+                                <span
+                                    v-for="(img, i) in post.images"
+                                    :key="i"
+                                    :class="['dot', { active: i === currentIndex }]"
+                                    @click="goTo(i)"
+                                ></span>
                             </div>
                         </div>
 
-                        <!-- Comments feed (scrollable) -->
-                        <div class="comments flex-grow-1 overflow-auto px-3 py-2">
-                            <!-- Caption as first comment -->
-                            <div class="mb-2">
-                                <span class="fw-bold me-1">{{ post.user.username }}</span>
-                                <span>{{ post.caption }}</span>
-                            </div>
-                            <div v-for="(c, i) in localComments" :key="i" class="mb-2">
-                                <span class="fw-bold me-1">{{ c.user }}</span>
-                                <span>{{ c.text }}</span>
-                            </div>
-                        </div>
-
-                        <!-- Actions & meta -->
-                        <div class="px-3 py-2 border-top">
-                            <div class="d-flex align-items-center mb-2">
-                                <button class="btn btn-link p-0 me-3 action-btn d-flex align-items-center" @click="toggleLike">
-                                    <i :class="liked ? 'bi-heart-fill text-danger' : 'bi-heart'"></i>
-                                    <span class="action-label ms-2">{{ liked ? 'Đã thích' : 'Thích' }}</span>
-                                </button>
-
-                                <button class="btn btn-link p-0 me-3 action-btn d-flex align-items-center" @click="focusComment">
-                                    <i class="bi-chat"></i>
-                                    <span class="action-label ms-2">Bình luận</span>
-                                </button>
-
-                                <button class="btn btn-link p-0 me-3 action-btn d-flex align-items-center">
-                                    <i class="bi-share"></i>
-                                    <span class="action-label ms-2">Chia sẻ</span>
-                                </button>
-
+                        <!-- Right: Details -->
+                        <div class="post-details d-flex flex-column">
+                            <!-- Header -->
+                            <div class="d-flex align-items-center px-3 py-2 border-bottom">
+                                <img :src="post.user.avatar" class="rounded-circle user-avatar" alt="avatar" />
+                                <div class="ms-2">
+                                    <div class="username">{{ post.user.username }}</div>
+                                    <div class="location text-muted small">{{ post.location }}</div>
+                                </div>
                                 <div class="ms-auto">
-                                    <button class="btn btn-link p-0 action-btn d-flex align-items-center">
-                                        <i class="bi-bookmark"></i>
-                                        <span class="action-label ms-2">Lưu</span>
-                                    </button>
+                                    <button class="btn btn-sm btn-link text-muted">...</button>
                                 </div>
                             </div>
-                            <div class="likes fw-bold mb-1">{{ likeCountText }}</div>
-                            <div class="text-muted small mb-2">{{ timeAgo }}</div>
 
-                            <!-- Add comment -->
-                            <form class="d-flex align-items-center" @submit.prevent="addComment">
-                                <input
-                                    v-model="newComment"
-                                    ref="commentInput"
-                                    class="form-control form-control-sm me-2"
-                                    placeholder="Thêm bình luận..."
-                                />
-                                <button type="submit" class="btn btn-link px-2" :disabled="!newComment.trim()">Đăng</button>
-                            </form>
+                            <!-- Comments feed (scrollable) -->
+                            <div class="comments flex-grow-1 overflow-auto px-3 py-2">
+                                <!-- Caption as first comment -->
+                                <div class="mb-2">
+                                    <span class="fw-bold me-1">{{ post.user.username }}</span>
+                                    <span>{{ post.caption }}</span>
+                                </div>
+                                <div v-for="(c, i) in localComments" :key="i" class="mb-2">
+                                    <span class="fw-bold me-1">{{ c.user }}</span>
+                                    <span>{{ c.text }}</span>
+                                </div>
+                            </div>
+
+                            <!-- Actions & meta -->
+                            <div class="px-3 py-2 border-top">
+                                <div class="d-flex align-items-center mb-2">
+                                    <button class="btn btn-link p-0 me-3 action-btn d-flex align-items-center" @click="toggleLike">
+                                        <i :class="liked ? 'bi-heart-fill text-danger' : 'bi-heart'"></i>
+                                        <span class="action-label ms-2">{{ liked ? 'Đã thích' : 'Thích' }}</span>
+                                    </button>
+
+                                    <button class="btn btn-link p-0 me-3 action-btn d-flex align-items-center" @click="focusComment">
+                                        <i class="bi-chat"></i>
+                                        <span class="action-label ms-2">Bình luận</span>
+                                    </button>
+
+                                    <button class="btn btn-link p-0 me-3 action-btn d-flex align-items-center">
+                                        <i class="bi-share"></i>
+                                        <span class="action-label ms-2">Chia sẻ</span>
+                                    </button>
+
+                                    <div class="ms-auto">
+                                        <button class="btn btn-link p-0 action-btn d-flex align-items-center">
+                                            <i class="bi-bookmark"></i>
+                                            <span class="action-label ms-2">Lưu</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="likes fw-bold mb-1">{{ likeCountText }}</div>
+                                <div class="text-muted small mb-2">{{ timeAgo }}</div>
+
+                                <!-- Add comment -->
+                                <form class="d-flex align-items-center" @submit.prevent="addComment">
+                                    <input
+                                        v-model="newComment"
+                                        ref="commentInput"
+                                        class="form-control form-control-sm me-2"
+                                        placeholder="Thêm bình luận..."
+                                    />
+                                    <button type="submit" class="btn btn-link px-2" :disabled="!newComment.trim()">Đăng</button>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>  
+
+        <div class="overlay-close">
+            <button class="close-btn" @click="$router.back()">✕</button>
+        </div>
+    </div>
 </template>
 
 <script>
@@ -109,7 +115,6 @@ for (const key in __assetModules) {
     assetMap[name] = __assetModules[key]
 }
 
-import avatar1 from '@/assets/img01.jpg'
 
 export default {
     name: "PostView",
@@ -119,11 +124,14 @@ export default {
             default: () => ({
                 user: {
                     username: "leminh",
-                    avatar: avatar1,
+                    avatar: 'img02.jpg',
                 },
                 images: [
-                    'photo1.svg',
-                    'photo2.svg'
+                    'img02.jpg',
+                    'img03.jpg',
+                    'img04.jpg',
+                    'img05.jpg',
+                    'img06.jpg',
                 ],
                 location: "Hanoi, Vietnam",
                 caption: "Một ngày đẹp trời!",
@@ -144,6 +152,9 @@ export default {
             likeCount: this.post.likes,
             newComment: "",
             localComments: Array.isArray(this.post.comments) ? [...this.post.comments] : []
+            ,
+            // expose avatars for sidebar usage (pull from assetMap if available)
+            avatars: [assetMap['avatar1.svg'] || '', assetMap['avatar2.svg'] || '', assetMap['avatar3.svg'] || '', assetMap['avatar4.svg'] || '', assetMap['avatar5.svg'] || '', assetMap['avatar6.svg'] || '']
         };
     },
     computed: {
@@ -284,5 +295,32 @@ export default {
     .post-images, .post-details { width: 100%; }
     .post-images { min-height: 320px; }
     .post-details { min-height: 220px; }
+}
+
+/* Fullscreen overlay styles */
+.post-view.fullscreen {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 1050;
+}
+.post-view.fullscreen .post-card {
+    width: min(1100px, 96%);
+    height: calc(100vh - 80px);
+    display: flex;
+    overflow: hidden;
+}
+.post-view.fullscreen .post-images { min-height: auto; }
+.post-view.fullscreen .post-details { height: 100%; }
+.overlay-close { position: absolute; top: 12px; right: 18px; z-index: 1100 }
+.close-btn { background: rgba(255,255,255,0.9); border: none; padding: 8px 10px; border-radius: 6px; cursor: pointer; font-size: 18px }
+
+@media (max-width: 992px) {
+    .post-view.fullscreen { padding: 8px }
+    .post-view.fullscreen .post-card { height: calc(100vh - 32px); flex-direction: column }
 }
 </style>
