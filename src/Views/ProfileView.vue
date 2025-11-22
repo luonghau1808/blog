@@ -1,52 +1,79 @@
 <template>
     <div class="profile-view">
-        <div class="container">
-            <!-- Cover & Avatar -->
-            <div class="card mb-4 overflow-hidden">
-                <div class="cover" :style="{ backgroundImage: 'url(' + user.cover + ')' }"></div>
-                <div class="card-body pt-0">
+        <!-- Cover -->
+        <div class="profile-cover bg-dark text-white position-relative">
+                     
+            <div class="container">
+                <div class="d-flex align-items-end justify-content-between" style="height: 220px;">
                     <div class="d-flex align-items-end">
-                        <div class="avatar-wrap">
-                            <img :src="user.avatar" alt="avatar" class="avatar img-thumbnail" />
+                        <div class="profile-avatar-wrapper">
+                            <img :src="user.avatar" class="profile-avatar rounded-circle border" alt="Avatar" />
                         </div>
-                        <div class="ms-3 flex-grow-1 mt-2 ">
-                            <h3 class="mb-2">{{ user.name }}</h3>
-                            <p class="text-muted mb-1">{{ user.title }}</p>
-                            <div>
-                                <button class="btn btn-primary btn-sm me-2">Chỉnh sửa trang cá nhân</button>
-                                <button class="btn btn-outline-secondary btn-sm">Bạn bè</button>
-                            </div>
+                        <div class="ms-3 mb-3">
+                            <h2 class="mb-0">{{ user.name }}</h2>
+                            <p class="text-muted mb-0">{{ user.location }}</p>
                         </div>
-                        
+                    </div>
+                    <div class="mb-3">
+                        <button class="btn btn-primary me-2">Chỉnh sửa trang cá nhân</button>                       
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Main layout -->
-            <div class="row">
-                <!-- Left: Feed -->
-                <div class="col-lg-8">
-                    <!-- About quick -->
+        <!-- Tabs -->
+        <div class="container">
+            <ul class="nav nav-tabs mt-3">
+                <li class="nav-item" v-for="tab in tabs" :key="tab">
+                    <a class="nav-link" :class="{ active: activeTab === tab }" href="#" @click.prevent="activeTab = tab">{{ tab }}</a>
+                </li>
+            </ul>
+
+            <!-- Content -->
+            <div class="row mt-4">
+                <!-- Left Sidebar -->
+                <aside class="col-lg-3 mb-4">
                     <div class="card mb-3">
                         <div class="card-body">
-                            <h5>Giới thiệu</h5>
-                            <p class="mb-1"><strong>Vị trí:</strong> {{ user.location }}</p>
-                            <p class="mb-1"><strong>Công việc:</strong> {{ user.work }}</p>
-                            <p class="mb-0"><strong>Trình độ học vấn:</strong> {{ user.education }}</p>
+                            <h5 class="card-title">Giới thiệu</h5>
+                            <p class="card-text mb-1"><strong>Công việc:</strong> {{ user.work }}</p>
+                            <p class="card-text mb-1"><strong>Học vấn:</strong> {{ user.education }}</p>
+                            <p class="card-text mb-1"><strong>Vị trí:</strong> {{ user.location }}</p>
+                            <p class="card-text"><strong>Tham gia:</strong> {{ user.joined }}</p>
                         </div>
                     </div>
 
-                    <!-- Post composer -->
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Bạn bè</h5>
+                            <div class="row g-2">
+                                <div class="col-4" v-for="f in friends" :key="f.id">
+                                    <img :src="f.avatar" class="img-fluid rounded" :alt="f.name" />
+                                </div>
+                            </div>
+                            <a href="#" class="d-block text-decoration-none mt-2">Xem tất cả</a>
+                        </div>
+                    </div>
+                </aside>
+
+                <!-- Main Feed -->
+                <main class="col-lg-6 mb-4">
+                    <!-- Composer -->
                     <div class="card mb-3">
                         <div class="card-body">
-                            <div class="d-flex">
-                                <img :src="user.avatar" alt="avatar" class="rounded-circle me-2" style="width:48px;height:48px;object-fit:cover"/>
-                                <input v-model="newPost" class="form-control m-2" placeholder="Bạn đang nghĩ gì?" />
-                                  <div class="m-2 text-end">
-                                <button class="btn btn-sm btn-primary" @click="addPost">Đăng bài viết</button>
+                            <div class="row">
+                                <div class="col-10">
+                                    <div class="d-flex">
+                                <img :src="user.avatar" class="rounded-circle me-2" width="48" height="48" alt="avatar" />
+                                <input v-model="newPost" class="form-control" placeholder="Bạn đang nghĩ gì" />                              
                             </div>
+                                </div>
+                                <div class="col-2">
+                                    <button class="btn btn-primary mt-2" @click="addPost">Đăng</button>
+                                </div>
                             </div>
-                          
+                            
+                            
                         </div>
                     </div>
 
@@ -54,166 +81,175 @@
                     <div v-for="post in posts" :key="post.id" class="card mb-3">
                         <div class="card-body">
                             <div class="d-flex mb-2">
-                                <img :src="post.user.avatar || user.avatar" class="rounded-circle me-2" style="width:48px;height:48px;object-fit:cover"/>
+                                <img :src="post.user.avatar" class="rounded-circle me-2" width="48" height="48" alt="avatar" />
                                 <div>
                                     <div class="fw-bold">{{ post.user.name }}</div>
                                     <small class="text-muted">{{ post.time }}</small>
                                 </div>
                             </div>
-                            <p class="mb-2">{{ post.text }}</p>
-                            <img :src="post.image" class="img-fluid rounded mb-2" />
-                            <div class="d-flex justify-content-between small text-muted">
-                                <div>{{ post.likes }} Like</div>
-                                <div>{{ post.comments.length }} Bình luận</div>
-                            </div>
-                            <hr />
-                            <div class="d-flex">
-                                <button class="btn btn-light btn-sm me-2" @click="toggleLike(post)">{{ post.liked ? 'Unlike' : 'Like' }}</button>
-                                <button class="btn btn-light btn-sm me-2">Bình luận</button>
-                                <button class="btn btn-light btn-sm">Share</button>
+                            <p>{{ post.content }}</p>
+                            <img v-if="post.image" :src="post.image" class="img-fluid rounded" alt="post image" />
+                            <div class="d-flex justify-content-between mt-3 text-muted small">
+                                <div><i class="bi bi-hand-thumbs-up me-1"></i> {{ post.likes }} Likes</div>
+                                <div>{{ post.comments }} Comments</div>
                             </div>
                         </div>
                     </div>
-                </div>
+                </main>
 
-                <!-- Right: Sidebar -->
-                <div class="col-lg-4">
+                <!-- Right Sidebar -->
+                <aside class="col-lg-3 mb-4">
                     <div class="card mb-3">
                         <div class="card-body">
-                            <h6 class="mb-3">Friends</h6>
-                            <div class="d-flex flex-wrap">
-                                <div v-for="f in friends" :key="f.id" class="me-2 mb-2 text-center" style="width:72px;">
-                                    <img :src="f.avatar" class="rounded-circle mb-1" style="width:64px;height:64px;object-fit:cover" />
-                                    <div class="small">{{ f.name }}</div>
-                                </div>
-                            </div>
-                            <div class="text-end mt-2">
-                                <a href="#" class="small">Xem tất cả</a>
-                            </div>
+                            <h6 class="card-title">Lời mời kết bạn </h6>
+                            <ul class="list-unstyled mb-0">
+                                <li class="d-flex align-items-center mb-2" v-for="s in suggestions" :key="s.id">
+                                    <img :src="s.avatar" class="rounded-circle me-2" width="40" height="40" alt="s" />
+                                    <div class="flex-grow-1">
+                                        <div class="fw-bold">{{ s.name }}</div>
+                                        <small class="text-muted">Bạn chung: {{ s.mutual }}</small>
+                                    </div>
+                                    <button class="btn btn-sm btn-outline-primary">Chấp nhận</button>
+                                </li>
+                            </ul>
                         </div>
                     </div>
 
                     <div class="card">
                         <div class="card-body">
-                            <h6 class="mb-2">Hình ảnh</h6>
+                            <h6 class="card-title">Ảnh</h6>
                             <div class="row g-2">
-                                <div class="col-4" v-for="(p,i) in photos" :key="i">
-                                    <img :src="p" class="img-fluid rounded" style="height:72px;object-fit:cover;width:100%" />
+                                <div class="col-4" v-for="p in photos" :key="p">
+                                    <img :src="p" class="img-fluid rounded" alt="photo" />
                                 </div>
                             </div>
-                            <div class="text-end mt-2">
-                                <a href="#" class="small">Xem tất cả</a>
-                            </div>
+                            <a href="#" class="d-block text-decoration-none mt-2">Xem tất cả</a>
                         </div>
                     </div>
-                </div>
-            </div> <!-- /row -->
-        </div> <!-- /container -->
+                </aside>
+            </div>
+        </div>
     </div>
 </template>
 
-<script setup>
-import { ref } from 'vue'
-import avatar1 from '../assets/img01.jpg'
-import avatar2 from '../assets/img02.jpg'
-import avatar3 from '../assets/img03.jpg'
-import avatar4 from '../assets/img04.jpg'
-import avatar5 from '../assets/img05.jpg'
-import avatar6 from '../assets/img17.jpg'
-
-const user = {
-    name: 'Ng Thi Luong Hau',
-    avatar: avatar1,
-    cover: '../assets/img01.jpg',
-    location: 'Ha Noi City, Vietnam',
-    work: 'FPT Sofware',
-    education: 'FPT University'
-}
-
-const friends = [
-    { id: 1, name: 'Mai', avatar: avatar6 },
-    { id: 2, name: 'Huy', avatar: avatar2 },
-    { id: 3, name: 'Linh', avatar: avatar3 },
-    { id: 4, name: 'Tuan', avatar: avatar4 },
-    { id: 5, name: 'Hoa', avatar: avatar5 },
-]
-
-const photos = [
-    'img02.jpg',
-    'img03.jpg',
-    'img04.jpg',
-    'img05.jpg',
-    'img06.jpg'
-
-]
-
-const posts = ref([
-    {
-        id: 1,
-        user: { name: user.name, avatar: user.avatar },
-        time: '2 hrs',
-        text: 'Chia sẻ suy nghĩ mới hôm nay!',
-        image: 'img13.jpg',
-        likes: 12,
-        liked: false,
-        comments: []
+<script>
+export default {
+    name: "ProfileView",
+    data() {
+        return {
+            tabs: ["Bài viết", "Giới thiệu", "Bạn bè", "Ảnh", "Xem thêm"],
+            activeTab: "Bài viết",
+            newPost: "",
+            user: {
+                name: "Ng Thi Luong Hau",
+                location: "Hanoi, Vietnam",
+                work: "Frontend Developer",
+                education: "FPT University",
+                joined: "January 2015",
+                avatar: '/img01.jpg',
+                
+            },
+            friends: [
+                { id: 1, name: "Bạn 1", avatar: 'img11.jpg' },
+                { id: 2, name: "Bạn 2", avatar: 'img19.jpg' },
+                { id: 3, name: "Bạn 3", avatar: 'img13.jpg' },
+                { id: 4, name: "Bạn 4", avatar: 'img18.jpg' },
+                { id: 5, name: "Bạn 5", avatar: 'img15.jpg' },
+                { id: 6, name: "Bạn 6", avatar: 'img05.jpg' }
+            ],
+            suggestions: [
+                { id: 1, name: "Lê Thị Ngọc Anh", avatar: 'img02.jpg', mutual: 3 },
+                { id: 2, name: "Trần Thị Linh", avatar: 'img12.jpg', mutual: 2 }
+            ],
+            photos: [
+                '/img02.jpg',
+                '/img03.jpg',
+                '/img04.jpg',
+                '/img05.jpg',
+                '/img15.jpg',
+                '/img21.jpg'
+            ],
+            posts: [
+                {
+                    id: 1,
+                    user: { name: "Ng Thi Luong Hau", avatar: '/img01.jpg' },
+                    time: "2 hrs",
+                    content: "Một khoảnh khắc tuyệt vời từ chuyến đi gần đây",
+                    image: "/img21.jpg",
+                    likes: 34,
+                    comments: 5
+                },
+                {
+                    id: 2,
+                    user: { name: "Ng Thi Luong Hau", avatar: '/img01.jpg' },
+                    time: "Yesterday",
+                    content: "hehe.",
+                    image: null,
+                    likes: 12,
+                    comments: 2
+                }
+            ]
+        };
     },
-    {
-        id: 2,
-        user: { name: user.name, avatar: user.avatar },
-        time: 'Yesterday',
-        text: 'Một buổi sáng tuyệt vời để code.',
-        image: null,
-        likes: 5,
-        liked: false,
-        comments: [{ text: 'Nice!' }]
+    methods: {
+        addPost() {
+            if (!this.newPost.trim()) return;
+            this.posts.unshift({
+                id: Date.now(),
+                user: { name: this.user.name, avatar: this.user.avatar },
+                time: "Just now",
+                content: this.newPost,
+                image: null,
+                likes: 0,
+                comments: 0
+            });
+            this.newPost = "";
+        }
     }
-])
-
-const newPost = ref('')
-
-function addPost() {
-    const text = newPost.value && newPost.value.trim()
-    if (!text) return
-    posts.value.unshift({
-        id: Date.now(),
-        user: { name: user.name, avatar: user.avatar },
-        time: 'Just now',
-        text,
-        image: null,
-        likes: 0,
-        liked: false,
-        comments: []
-    })
-    newPost.value = ''
-}
-
-function toggleLike(post) {
-    post.liked = !post.liked
-    post.likes += post.liked ? 1 : -1
-}
+};
 </script>
 
 <style scoped>
-.cover {
-    height: 220px;
-    background-size: cover;
-    background-position: center;
+.profile-cover {
+    overflow: hidden;
+    height: 260px;
 }
-.avatar-wrap {
-    margin-top: -60px;
-    margin-left: 16px;
-}
-.avatar {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
+.cover-img {
     object-fit: cover;
-    border: 4px solid white;
+    height: 260px;
+    filter: brightness(0.6);
 }
-@media (max-width: 767px) {
-    .avatar-wrap { margin-left: 8px; margin-top: -50px; }
-    .avatar { width: 90px; height: 90px; }
-    .cover { height: 160px; }
+.profile-avatar-wrapper {
+    margin-top: 90px;
+    position: relative;
+    width: 140px;
+    height: 140px;
+}
+.profile-avatar {
+    width: 140px;
+    height: 140px;
+    object-fit: cover;
+    border-width: 4px !important;
+    background: #fff;
+}
+.card .card-title {
+    font-size: 1rem;
+}
+.profile-view .nav-tabs .nav-link {
+    color: #495057;
+}
+.profile-view .nav-tabs .nav-link.active {
+    color: #0d6efd;
+}
+@media (max-width: 991px) {
+    .profile-avatar-wrapper {
+        margin-top: 60px;
+        width: 100px;
+        height: 100px;
+    }
+    .profile-avatar {
+        width: 100px;
+        height: 100px;
+    }
 }
 </style>
