@@ -17,11 +17,10 @@
                             </svg>
                         </a>
                         <a href="#" class="icon-btn" title="Trang cá nhân">
-                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"
-                                        >
-                                        <path
-                                            d="M240 192C240 147.8 275.8 112 320 112C364.2 112 400 147.8 400 192C400 236.2 364.2 272 320 272C275.8 272 240 236.2 240 192zM448 192C448 121.3 390.7 64 320 64C249.3 64 192 121.3 192 192C192 262.7 249.3 320 320 320C390.7 320 448 262.7 448 192zM144 544C144 473.3 201.3 416 272 416L368 416C438.7 416 496 473.3 496 544L496 552C496 565.3 506.7 576 520 576C533.3 576 544 565.3 544 552L544 544C544 446.8 465.2 368 368 368L272 368C174.8 368 96 446.8 96 544L96 552C96 565.3 106.7 576 120 576C133.3 576 144 565.3 144 552L144 544z" />
-                                    </svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
+                                <path
+                                    d="M240 192C240 147.8 275.8 112 320 112C364.2 112 400 147.8 400 192C400 236.2 364.2 272 320 272C275.8 272 240 236.2 240 192zM448 192C448 121.3 390.7 64 320 64C249.3 64 192 121.3 192 192C192 262.7 249.3 320 320 320C390.7 320 448 262.7 448 192zM144 544C144 473.3 201.3 416 272 416L368 416C438.7 416 496 473.3 496 544L496 552C496 565.3 506.7 576 520 576C533.3 576 544 565.3 544 552L544 544C544 446.8 465.2 368 368 368L272 368C174.8 368 96 446.8 96 544L96 552C96 565.3 106.7 576 120 576C133.3 576 144 565.3 144 552L144 544z" />
+                            </svg>
                         </a>
                         <a href="#" class="icon-btn" title="Khám phá">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
@@ -37,19 +36,30 @@
                         </a>
                     </div>
                 </div>
-                <div class="d-flex  gap-3">
+                <div class="d-flex align-items-center gap-4 ms-auto">
+  <!-- Notification -->
+  <a href="#" title="Thông báo" class="position-relative">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="24" height="24">
+      <path d="M320 64C306.7 64 296 74.7 296 88L296 97.7C214.6 109.3 152 179.4 152 264L152 278.5C152 316.2 142 353.2 123 385.8L101.1 423.2C97.8 429 96 435.5 96 442.2C96 463.1 112.9 480 133.8 480L506.2 480C527.1 480 544 463.1 544 442.2C544 435.5 542.2 428.9 538.9 423.2L517 385.7C498 353.1 488 316.1 488 278.4L488 263.9C488 179.3 425.4 109.2 344 97.6L344 87.9C344 74.6 333.3 63.9 320 63.9zM488.4 432L151.5 432L164.4 409.9C187.7 370 200 324.6 200 278.5L200 264C200 197.7 253.7 144 320 144C386.3 144 440 197.7 440 264L440 278.5C440 324.7 452.3 370 475.5 409.9L488.4 432zM252.1 528C262 556 288.7 576 320 576C351.3 576 378 556 387.9 528L252.1 528z"/>
+    </svg>
+    <!-- Badge thông báo nếu muốn -->
+    <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"></span>
+  </a>
 
-                    <div class="rounded-circle overflow-hidden " style="width:32px;height:32px;">
-                        <img src="/img01.jpg" class="w-100 h-100 object-fit-cover" alt="avatar" />
-                    </div>
-                </div>
+  <!-- Avatar -->
+  <div class="rounded-circle overflow-hidden" style="width:32px;height:32px;">
+    <img src="/img01.jpg" class="w-100 h-100 object-fit-cover" alt="avatar" />
+  </div>
+</div>
+
+
             </div>
         </nav>
     </header>
     <br><br>
     <div class="container-fluid py-4 " style="padding-top: 70px;">
         <div class="row ">
-            <div class="col-2   d-none d-md-block">
+            <div class="col-lg-3  d-none d-md-block">
                 <aside class="left-sidebar">
                     <div class="" style="top:80px;">
                         <ul class="nav flex-column g-2">
@@ -147,7 +157,7 @@
                 </aside>
             </div>
             <!-- Main feed -->
-            <div class="col-lg-8 ">
+            <div class="col-lg-6 ">
                 <!-- Top bar -->
                 <div class="d-flex align-items-center justify-content-between mb-3">
                     <h4 class="mb-0">Story</h4>
@@ -176,12 +186,17 @@
                         </div>
                         <div class="position-relative">
                             <button class="btn btn-link p-0" @click="togglePostMenu(post.id)">•••</button>
-                            <div v-if="isPostMenuOpen(post.id)" class="card position-absolute" style="top: 28px; right: 8px; z-index: 60; min-width: 180px;">
+                            <div v-if="isPostMenuOpen(post.id)" class="card position-absolute"
+                                style="top: 28px; right: 8px; z-index: 60; min-width: 180px;">
                                 <div class="list-group list-group-flush">
-                                    <button class="list-group-item list-group-item-action" @click="copyPostLink(post)">Sao chép liên kết</button>
-                                    <button class="list-group-item list-group-item-action" @click="goToPost(post)">Đi đến bài viết</button>
-                                    <button class="list-group-item list-group-item-action text-danger" @click="reportPost(post)">Báo cáo</button>
-                                    <button class="list-group-item list-group-item-action" @click="closePostMenu(post.id)">Hủy</button>
+                                    <button class="list-group-item list-group-item-action"
+                                        @click="copyPostLink(post)">Sao chép liên kết</button>
+                                    <button class="list-group-item list-group-item-action" @click="goToPost(post)">Đi
+                                        đến bài viết</button>
+                                    <button class="list-group-item list-group-item-action text-danger"
+                                        @click="reportPost(post)">Báo cáo</button>
+                                    <button class="list-group-item list-group-item-action"
+                                        @click="closePostMenu(post.id)">Hủy</button>
                                 </div>
                             </div>
                         </div>
@@ -190,7 +205,7 @@
                     <div class="post-image position-relative" @touchstart.passive="onTouchStart($event, post)"
                         @touchend.passive="onTouchEnd($event, post)">
                         <img :src="(post.images && post.images.length) ? post.images[(imageIndex[post.id] || 0)] : post.image"
-                            class="post-image w-100" alt="post image"  />
+                            class="post-image w-100" alt="post image" />
 
                         <button v-if="post.images && post.images.length > 1" class="carousel-prev"
                             @click="prevImage(post)" aria-label="Previous image">‹</button>
@@ -251,10 +266,14 @@
                             <div v-for="c in displayedComments(post)" :key="c.id" class="mb-2 d-flex align-items-start">
                                 <div class="flex-grow-1">
                                     <template v-if="isEditingComment(post, c.id)">
-                                        <input :value="getCommentEditText(post, c.id)" @input="e => setCommentEditText(post, c.id, e.target.value)" type="text" class="form-control form-control-sm" />
+                                        <input :value="getCommentEditText(post, c.id)"
+                                            @input="e => setCommentEditText(post, c.id, e.target.value)" type="text"
+                                            class="form-control form-control-sm" />
                                         <div class="mt-1">
-                                            <button class="btn btn-sm btn-primary me-2" @click="saveEditComment(post, c.id)">Lưu</button>
-                                            <button class="btn btn-sm btn-outline-secondary" @click="cancelEditComment(post, c.id)">Hủy</button>
+                                            <button class="btn btn-sm btn-primary me-2"
+                                                @click="saveEditComment(post, c.id)">Lưu</button>
+                                            <button class="btn btn-sm btn-outline-secondary"
+                                                @click="cancelEditComment(post, c.id)">Hủy</button>
                                         </div>
                                     </template>
                                     <template v-else>
@@ -265,26 +284,33 @@
                                 </div>
                                 <div v-if="c.user === me.username" class="position-relative ms-2">
                                     <button class="btn btn-link p-0" @click="toggleCommentMenu(post, c.id)">•••</button>
-                                    <div v-if="isCommentMenuOpen(post, c.id)" class="card position-absolute" style="top: 20px; right: 0; z-index: 50; min-width: 140px;">
+                                    <div v-if="isCommentMenuOpen(post, c.id)" class="card position-absolute"
+                                        style="top: 20px; right: 0; z-index: 50; min-width: 140px;">
                                         <div class="list-group list-group-flush">
-                                            <button class="list-group-item list-group-item-action" @click="startEditComment(post, c.id)">Chỉnh sửa</button>
-                                            <button class="list-group-item list-group-item-action text-danger" @click="confirmDeleteComment(post, c.id)">Xóa</button>
+                                            <button class="list-group-item list-group-item-action"
+                                                @click="startEditComment(post, c.id)">Chỉnh
+                                                sửa</button>
+                                            <button class="list-group-item list-group-item-action text-danger"
+                                                @click="confirmDeleteComment(post, c.id)">Xóa</button>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <div class="input-group">
-                                <input :value="newCommentText[post.id] || ''" @input="e => newCommentText[post.id] = e.target.value" type="text" class="form-control" placeholder="Viết bình luận..." />
-                                <button class="btn btn-primary" @click="addComment(post)" :disabled="!(newCommentText[post.id] && newCommentText[post.id].trim())">Bình luận</button>
+                                <input :value="newCommentText[post.id] || ''"
+                                    @input="e => newCommentText[post.id] = e.target.value" type="text"
+                                    class="form-control" placeholder="Viết bình luận..." />
+                                <button class="btn btn-primary" @click="addComment(post)"
+                                    :disabled="!(newCommentText[post.id] && newCommentText[post.id].trim())">Bình
+                                    luận</button>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <!-- Composer card -->
 
             <!-- Right sidebar -->
-            <div class="col-lg-2 d-none d-lg-block ">
+            <div class="col-lg-3 d-none d-lg-block ">
                 <div class=" right-sidebar">
                     <!-- Profile summary -->
                     <div class="d-flex align-items-center mb-3">
@@ -350,7 +376,7 @@ const posts = reactive([
     {
         id: 1,
         user: "wyn.anh",
-        userAvatar: '/img11.jpg',
+        userAvatar: '/img09.jpg',
         location: "Hà Nội",
         images: ['/img08.jpg', '/img09.jpg', '/img10.jpg', '/img07.jpg'],
         likes: 213,
@@ -364,9 +390,9 @@ const posts = reactive([
     {
         id: 2,
         user: "buncry3107",
-        userAvatar: '/img20.jpg',
+        userAvatar: '/img11.jpg',
         location: "Đà Nẵng",
-        images: ['/img12.jpg', '/img13.jpg', '/img14.jpg'],
+        images: ['/img12.jpg', '/img13.jpg', '/img11.jpg'],
         likes: 102,
         caption: "Not perfect, but perfectly me 🧝🏻‍♀️✨",
         time: "6 giờ",
@@ -424,8 +450,8 @@ function onTouchEnd(e, post) {
 }
 
 const suggestions = [
-    { id: 1, user: "_.anhph", avatar: '/img11.jpg' },
-    { id: 2, user: "minh", avatar: '/img16.jpg' },
+    { id: 1, user: "_.anhph", avatar: '/img32.jpg' },
+    { id: 2, user: "minh", avatar: '/img10.jpg' },
     { id: 3, user: "2minhu1._", avatar: '/img20.jpg' },
 ];
 
@@ -482,7 +508,7 @@ function goToPost(post) {
     const payload = { ...post, currentImageIndex: (imageIndex[post.id] || 0) }
     try { sessionStorage.setItem('selectedPost', JSON.stringify(payload)) } catch (err) {
         console.error(err)
-        alert('Đã có lỗi xảy ra khi lưu bài viết')  
+        alert('Đã có lỗi xảy ra khi lưu bài viết')
     }
     router.push({ name: 'Post', params: { id: String(post.id) } })
 }
@@ -614,7 +640,14 @@ body {
 }
 
 /* Inline icon-only menu next to brand */
-.inline-icon-menu{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:40}
+.inline-icon-menu {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 40
+}
+
 .inline-icon-menu .icon-btn {
     width: 40px;
     height: 40px;
@@ -660,7 +693,7 @@ body {
     object-fit: cover;
     position: relative;
     overflow: hidden;
-     width: fit-content;
+    width: fit-content;
 }
 
 /* overlayed carousel controls inside the image */
@@ -736,8 +769,9 @@ body {
     fill: black;
     stroke: black;
 }
+
 .menu-icon:hover {
-   background: rgba(0, 0, 0, 0.04)
+    background: rgba(0, 0, 0, 0.04)
 }
 
 /* Make the left navigation stick while scrolling */
@@ -751,5 +785,14 @@ body {
     position: sticky;
     top: 80px;
     z-index: 30;
+
+}
+
+.nav-item .nav-link {
+    border-radius: 8px;
+}
+
+.nav-item .nav-link:hover {
+    background: rgba(0, 0, 0, 0.04)
 }
 </style>

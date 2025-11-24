@@ -88,7 +88,7 @@ function handleLogin() {
 }
 
 function forgotPassword() {
-    alert('Forgot password flow (demo)')
+    alert('Forgot password flow')
 }
 
 </script>
