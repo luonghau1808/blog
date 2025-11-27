@@ -38,8 +38,7 @@
                                 </div>
 
                                 <div class="d-grid mb-3">
-                                   <router-link :to="{ name: 'Home' }" class="btn btn-primary fw-semibold"
-                                        @click.prevent="handleLogin">Đăng nhập</router-link>
+                                    <button type="submit" class="btn btn-primary fw-semibold">Đăng nhập</button>
                                 </div>
 
                                 <div class="text-center mb-3">
@@ -65,6 +64,9 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 const email = ref('')
 const password = ref('')
@@ -82,13 +84,23 @@ function validate() {
 
 function handleLogin() {
     if (!validate()) return
-    // Replace with real authentication logic
-    console.log('Logging in with', { email: email.value, password: password.value })
-    alert('Logged in (demo)')
+    
+    const users = JSON.parse(localStorage.getItem('users') || '[]')
+    const user = users.find(u => u.contact === email.value && u.password === password.value)
+
+    if (user) {
+        // Login success
+        localStorage.setItem('currentUser', JSON.stringify(user))
+        alert('Đăng nhập thành công!')
+        router.push({ name: 'Home' })
+    } else {
+        // Login failed
+        passwordError.value = 'Thông tin đăng nhập không chính xác.'
+    }
 }
 
 function forgotPassword() {
-    alert('Forgot password flow')
+    alert('Chức năng quên mật khẩu chưa được hỗ trợ.')
 }
 
 </script>

@@ -14,15 +14,15 @@
             
             <label class="btn btn-light btn-sm mb-0">
               <input ref="fileInput" type="file" accept="image/*" class="d-none" multiple @change="onFileChange" />
-              <i class="bi bi-image"></i> Ảnh/Video
+              <i class="bi bi-image"></i> 🖼️Ảnh/Video
             </label>
-            <button class="btn btn-light btn-sm"><i class="bi bi-emoji-smile"></i> Cảm xúc</button>
-            <button class="btn btn-light btn-sm"><i class="bi bi-geo-alt"></i> Địa điểm</button>
+            <button class="btn btn-light btn-sm"><i class="bi bi-emoji-smile"></i> 🙂Cảm xúc</button>
+            <button class="btn btn-light btn-sm"><i class="bi bi-geo-alt"></i> 📍Địa điểm</button>
           </div>
 
           <div>
             <button class="btn btn-outline-secondary me-2" @click="cancel" :disabled="submitting">Hủy</button>
-            <button class="btn btn-primary" @click="submitPost" :disabled="submitting || !previews.length">
+            <button class="btn btn-primary" @click="submitPost" :disabled="submitting || (!previews.length && !caption.trim())">
               <span v-if="submitting" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
               Đăng
             </button>
@@ -91,16 +91,48 @@ const cancel = () => {
 }
 
 const submitPost = async () => {
-  if (!files.value.length) {
-    alert('Vui lòng chọn ít nhất một ảnh.')
+  if (!previews.value.length && !caption.value.trim()) {
+    alert('Vui lòng nhập nội dung hoặc chọn ảnh.')
     return
   }
   submitting.value = true
   try {
-    // demo submit
+    // Simulate network delay
     await new Promise((r) => setTimeout(r, 700))
+
+    // Get current user
+    const currentUserStr = localStorage.getItem('currentUser')
+    let user = { firstName: 'User', lastName: 'Name', contact: '' }
+    if (currentUserStr) {
+        user = JSON.parse(currentUserStr)
+    }
+    const username = (user.lastName && user.firstName) ? `${user.lastName} ${user.firstName}` : 'Người dùng'
+
+    // Create new post object
+    const newPost = {
+        id: Date.now(),
+        user: username,
+        userAvatar: '/img01.jpg', // Default avatar for now
+        location: 'Vietnam',
+        images: [...previews.value], // In a real app, these would be uploaded URLs
+        likes: 0,
+        caption: caption.value,
+        time: 'Vừa xong',
+        liked: false,
+        comments: [],
+        createdAt: Date.now()
+    }
+
+    // Save to localStorage
+    const existingPosts = JSON.parse(localStorage.getItem('posts') || '[]')
+    existingPosts.unshift(newPost)
+    localStorage.setItem('posts', JSON.stringify(existingPosts))
+
+    // Dispatch a custom event so other components can update immediately if they are listening
+    window.dispatchEvent(new Event('post-created'))
+
     resetForm()
-    alert('Đăng thành công (demo).')
+    alert('Đăng bài thành công!')
     emit('close')
   } catch (err) {
     console.error(err)

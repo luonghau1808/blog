@@ -287,11 +287,33 @@ function onSubmit() {
 
     if (!ok) return
 
-    // Giả lập gửi dữ liệu lên server
-    // Ở đây chỉ hiển thị thông báo thành công
+    // Check if user exists in localStorage
+    const users = JSON.parse(localStorage.getItem('users') || '[]')
+    const exists = users.find(u => u.contact === form.contact)
+    
+    if (exists) {
+        errors.contact = 'Tài khoản này đã tồn tại.'
+        return
+    }
+
+    // Save new user
+    const newUser = {
+        firstName: form.firstName,
+        lastName: form.lastName,
+        contact: form.contact,
+        birthDay: form.birthDay,
+        birthMonth: form.birthMonth,
+        birthYear: form.birthYear,
+        gender: form.gender,
+        password: form.password // In a real app, this should be hashed
+    }
+
+    users.push(newUser)
+    localStorage.setItem('users', JSON.stringify(users))
+
     success.value = true
 
-    // Reset form sau khi đăng ký thành công (tuỳ ý)
+    // Reset form
     form.firstName = ''
     form.lastName = ''
     form.contact = ''

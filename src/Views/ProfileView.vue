@@ -109,16 +109,13 @@
                         <div class="card mb-3">
                             <div class="card-body">
                                 <div class="row">
-                                    <div class="col-10">
+                                  
                                         <div class="d-flex">
                                             <img :src="user.avatar" class="rounded-circle me-2" width="48" height="48"
                                                 alt="avatar" />
-                                            <input v-model="newPost" class="form-control"
-                                                placeholder="Bạn đang nghĩ gì" />
-                                        </div>
-                                    </div>
-                                    <div class="col-2">
-                                        <button class="btn btn-primary mt-2" @click="addPost">Đăng</button>
+                                            <input :value="newPost" class="form-control"
+                                                placeholder="Bạn đang nghĩ gì?" @click="showComposer = true" readonly />
+                                       
                                     </div>
                                 </div>
                             </div>
@@ -294,13 +291,20 @@
             </div>
         </div>
     </div>
+    <PostComposer v-if="showComposer" @close="showComposer = false" />
 </template>
 
 <script>
+import PostComposer from "@/Views/PostComposer.vue";
+
 export default {
     name: "ProfileView",
+    components: {
+        PostComposer
+    },
     data() {
         return {
+            showComposer: false,
             tabs: ["Bài viết", "Giới thiệu", "Bạn bè", "Ảnh", "Xem thêm"],
             activeTab: "Bài viết",
             newPost: "",
@@ -324,7 +328,8 @@ export default {
                 { id: 2, name: "Trần Thị Linh", avatar: "img23.jpg", mutual: 2 },
             ],
             photos: ["/img18.jpg", "/img19.jpg", "/img20.jpg", "/img21.jpg", "/img22.jpg"],
-            posts: [
+            posts: [], // Will be loaded
+            staticPosts: [
                 {
                     id: 1,
                     user: { name: "Ng Thi Luong Hau", avatar: "/img01.jpg" },
@@ -360,18 +365,71 @@ export default {
             ],
         };
     },
+    created() {
+        this.loadUser();
+        this.loadPosts();
+        window.addEventListener('post-created', this.loadPosts);
+    },
+    beforeUnmount() {
+        window.removeEventListener('post-created', this.loadPosts);
+    },
     methods: {
+        loadUser() {
+            const currentUserStr = localStorage.getItem('currentUser');
+            if (currentUserStr) {
+                try {
+                    const u = JSON.parse(currentUserStr);
+                    if (u.lastName && u.firstName) {
+                        this.user.name = `${u.lastName} ${u.firstName}`;
+                    }
+                } catch (e) {
+                    console.error('Error parsing user', e);
+                }
+            }
+        },
+        loadPosts() {
+            const storedPosts = JSON.parse(localStorage.getItem('posts') || '[]');
+            // Filter posts for current user.
+            // Note: The stored posts structure is slightly different (user is a string name),
+            // while static posts use an object. We need to normalize or handle both.
+            // For this demo, we assume stored posts with matching user name belong to this profile.
+            
+            const myStoredPosts = storedPosts.filter(p => p.user === this.user.name).map(p => ({
+                ...p,
+                user: { name: p.user, avatar: p.userAvatar || this.user.avatar }, // Normalize structure
+                image: (p.images && p.images.length) ? p.images[0] : null, // Normalize image
+                showMenu: false,
+                showComments: false,
+                newComment: ""
+            }));
+
+            this.posts = [...myStoredPosts, ...this.staticPosts];
+        },
         addPost() {
             if (!this.newPost.trim()) return;
-            this.posts.unshift({
+            
+            const newPost = {
                 id: Date.now(),
-                user: { name: this.user.name, avatar: this.user.avatar },
-                time: "Just now",
-                content: this.newPost,
-                image: null,
+                user: this.user.name,
+                userAvatar: this.user.avatar,
+                location: this.user.location,
+                images: [],
                 likes: 0,
+                caption: this.newPost,
+                time: "Vừa xong",
+                liked: false,
                 comments: [],
-            });
+                createdAt: Date.now()
+            };
+
+            // Save to localStorage
+            const existingPosts = JSON.parse(localStorage.getItem('posts') || '[]');
+            existingPosts.unshift(newPost);
+            localStorage.setItem('posts', JSON.stringify(existingPosts));
+
+            // Dispatch event
+            window.dispatchEvent(new Event('post-created'));
+
             this.newPost = "";
         },
         toggleMenu(post) {
@@ -379,13 +437,24 @@ export default {
             post.showMenu = !post.showMenu;
         },
         editPost(post) {
-            const newText = prompt("Nhập nội dung mới:", post.content);
-            if (newText) post.content = newText;
+            const newText = prompt("Nhập nội dung mới:", post.content || post.caption); // Handle both structures
+            if (newText) {
+                post.content = newText;
+                post.caption = newText;
+            }
             post.showMenu = false;
         },
         deletePost(post) {
             if (confirm("Bạn có chắc muốn xóa bài viết?")) {
                 this.posts = this.posts.filter(p => p.id !== post.id);
+                // Also remove from localStorage if it exists there
+                let existingPosts = JSON.parse(localStorage.getItem('posts') || '[]');
+                const initialLen = existingPosts.length;
+                existingPosts = existingPosts.filter(p => p.id !== post.id);
+                if (existingPosts.length !== initialLen) {
+                     localStorage.setItem('posts', JSON.stringify(existingPosts));
+                     window.dispatchEvent(new Event('post-created'));
+                }
             }
         },
         hidePost(post) {
@@ -406,7 +475,12 @@ export default {
 
 <style scoped>
 .inline-icon-menu {
-    position: absolute; }
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 40;
+}
 .card { border-radius: 15px; }
 .card textarea { border-radius: 10px; }
 .dropdown-item:hover { background: #f1f1f1; cursor: pointer; }

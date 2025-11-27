@@ -16,12 +16,12 @@
                                     d="M304 70.1C313.1 61.9 326.9 61.9 336 70.1L568 278.1C577.9 286.9 578.7 302.1 569.8 312C560.9 321.9 545.8 322.7 535.9 313.8L527.9 306.6L527.9 511.9C527.9 547.2 499.2 575.9 463.9 575.9L175.9 575.9C140.6 575.9 111.9 547.2 111.9 511.9L111.9 306.6L103.9 313.8C94 322.6 78.9 321.8 70 312C61.1 302.2 62 287 71.8 278.1L304 70.1zM320 120.2L160 263.7L160 512C160 520.8 167.2 528 176 528L224 528L224 424C224 384.2 256.2 352 296 352L344 352C383.8 352 416 384.2 416 424L416 528L464 528C472.8 528 480 520.8 480 512L480 263.7L320 120.3zM272 528L368 528L368 424C368 410.7 357.3 400 344 400L296 400C282.7 400 272 410.7 272 424L272 528z" />
                             </svg>
                         </a>
-                        <a href="#" class="icon-btn" title="Trang cá nhân">
+                        <router-link :to="{ name: 'Profile' }" class="icon-btn" title="Trang cá nhân">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
                                 <path
                                     d="M240 192C240 147.8 275.8 112 320 112C364.2 112 400 147.8 400 192C400 236.2 364.2 272 320 272C275.8 272 240 236.2 240 192zM448 192C448 121.3 390.7 64 320 64C249.3 64 192 121.3 192 192C192 262.7 249.3 320 320 320C390.7 320 448 262.7 448 192zM144 544C144 473.3 201.3 416 272 416L368 416C438.7 416 496 473.3 496 544L496 552C496 565.3 506.7 576 520 576C533.3 576 544 565.3 544 552L544 544C544 446.8 465.2 368 368 368L272 368C174.8 368 96 446.8 96 544L96 552C96 565.3 106.7 576 120 576C133.3 576 144 565.3 144 552L144 544z" />
                             </svg>
-                        </a>
+                        </router-link>
                         <a href="#" class="icon-btn" title="Khám phá">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
                                 <path
@@ -234,7 +234,7 @@
                                 </svg>
                             </button>
 
-                            <button class="btn btn-link p-0 me-3" @click="toggleComments(post)">
+                            <button class="btn btn-link p-0 me-3" @click="goToPost(post)">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none"
                                     stroke="currentColor" stroke-width="2" class="bi bi-chat">
                                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2z" />
@@ -363,6 +363,19 @@ const me = reactive({
     avatar: '/img01.jpg',
 });
 
+// Load user from localStorage
+const currentUserStr = localStorage.getItem('currentUser')
+if (currentUserStr) {
+    try {
+        const u = JSON.parse(currentUserStr)
+        if (u.lastName && u.firstName) {
+            me.username = `${u.lastName} ${u.firstName}`
+        }
+    } catch (e) {
+        console.error('Error parsing user', e)
+    }
+}
+
 const stories = [
     { id: 1, user: "wyn.anh", avatar: '/img27.jpg' },
     { id: 2, user: "_ttqueen", avatar: '/img21.jpg' },
@@ -372,7 +385,7 @@ const stories = [
     { id: 6, user: "_dino.makeup", avatar: '/img09.jpg' },
 ];
 
-const posts = reactive([
+const staticPosts = [
     {
         id: 1,
         user: "wyn.anh",
@@ -399,7 +412,32 @@ const posts = reactive([
         liked: false,
         comments: []
     },
-]);
+];
+
+const posts = reactive([]);
+
+function loadPosts() {
+    const storedPosts = JSON.parse(localStorage.getItem('posts') || '[]');
+    // Merge stored posts with static posts. Stored posts come first (newer).
+    // Note: In a real app, you'd fetch everything from an API.
+    const allPosts = [...storedPosts, ...staticPosts];
+    
+    // Update 'liked' state for current user
+    allPosts.forEach(p => {
+        if (p.likedBy && Array.isArray(p.likedBy)) {
+            p.liked = p.likedBy.includes(me.username);
+        } else {
+            p.liked = false;
+        }
+    });
+    
+    posts.splice(0, posts.length, ...allPosts);
+}
+
+loadPosts();
+
+// Listen for new posts
+window.addEventListener('post-created', loadPosts);
 
 // per-post image index
 const imageIndex = reactive({})
@@ -456,8 +494,48 @@ const suggestions = [
 ];
 
 function toggleLike(post) {
-    post.liked = !post.liked;
-    post.likes += post.liked ? 1 : -1;
+    // Ensure likes is a number
+    if (typeof post.likes !== 'number') post.likes = 0;
+    
+    // Check if user already liked this post
+    // In a real app, we would check against a list of user IDs who liked the post.
+    // For this demo, we'll use a local property 'liked' on the post object, 
+    // but to persist it correctly across reloads for the *current user*, 
+    // we should ideally store a list of users who liked it.
+    // However, since the prompt asks for "mỗi người chỉ được ấn 1 lần" (each person can only click once),
+    // and "sau khi chạy lại thì vẫn hiện bài viết đã tim" (persist after reload),
+    // we need to modify the data structure slightly or assume 'liked' property is per-user context (which is tricky with shared localStorage).
+    
+    // BETTER APPROACH for this demo:
+    // We will add a 'likedBy' array to the post if it doesn't exist.
+    // We will check if the current user's username is in that array.
+    
+    const username = me.username;
+    if (!post.likedBy) post.likedBy = [];
+    
+    const alreadyLiked = post.likedBy.includes(username);
+    
+    if (alreadyLiked) {
+        // Unlike
+        post.likes--;
+        post.likedBy = post.likedBy.filter(u => u !== username);
+        post.liked = false; // Update UI state for current user
+    } else {
+        // Like
+        post.likes++;
+        post.likedBy.push(username);
+        post.liked = true; // Update UI state for current user
+    }
+    
+    // Update localStorage
+    const storedPosts = JSON.parse(localStorage.getItem('posts') || '[]');
+    const index = storedPosts.findIndex(p => p.id === post.id);
+    if (index !== -1) {
+        storedPosts[index] = { ...storedPosts[index], likes: post.likes, likedBy: post.likedBy };
+        localStorage.setItem('posts', JSON.stringify(storedPosts));
+        // Dispatch event to sync
+        window.dispatchEvent(new Event('post-created'));
+    }
 }
 
 const newCommentText = reactive({})
