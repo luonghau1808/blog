@@ -61,7 +61,8 @@
                   <img :src="post.userAvatar" class="rounded-circle me-2" width="40" height="40" />
                   <div class="flex-grow-1">
                     <div class="fw-bold">{{ post.user }}</div>
-                    <small class="text-muted">{{ post.time }}</small>
+                    <small class="text-muted" v-if="post.location">{{ post.location }}</small>
+                    <div class="text-muted small">{{ post.createdAt ? timeAgo(post.createdAt) : post.time }}</div>
                   </div>
                   <div class="position-relative ms-auto">
                     <button class="btn btn-link p-0" @click="menuOpen = !menuOpen">•••</button>

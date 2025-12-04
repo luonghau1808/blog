@@ -17,7 +17,7 @@
               <i class="bi bi-image"></i> 🖼️Ảnh/Video
             </label>
             <button class="btn btn-light btn-sm"><i class="bi bi-emoji-smile"></i> 🙂Cảm xúc</button>
-            <button class="btn btn-light btn-sm"><i class="bi bi-geo-alt"></i> 📍Địa điểm</button>
+            <button class="btn btn-light btn-sm" @click="toggleLocation"><i class="bi bi-geo-alt"></i> 📍Địa điểm</button>
           </div>
 
           <div>
@@ -27,6 +27,10 @@
               Đăng
             </button>
           </div>
+        </div>
+
+        <div v-if="showLocationInput" class="mt-2">
+          <input v-model="location" type="text" class="form-control" placeholder="Nhập địa điểm..." />
         </div>
 
         <div v-if="previews.length" class="mt-3 d-flex gap-2 flex-wrap">
@@ -51,6 +55,8 @@ const fileInput = ref(null)
 const previews = ref([])
 const files = ref([])
 const caption = ref('')
+const location = ref('')
+const showLocationInput = ref(false)
 const submitting = ref(false)
 
 const userAvatar = '/img01.jpg'
@@ -79,10 +85,19 @@ const removeImage = (index) => {
   files.value.splice(index, 1)
 }
 
+const toggleLocation = () => {
+  showLocationInput.value = !showLocationInput.value
+  if (!showLocationInput.value) {
+    location.value = ''
+  }
+}
+
 const resetForm = () => {
   previews.value = []
   files.value = []
   caption.value = ''
+  location.value = ''
+  showLocationInput.value = false
 }
 
 const cancel = () => {
@@ -113,7 +128,7 @@ const submitPost = async () => {
         id: Date.now(),
         user: username,
         userAvatar: '/img01.jpg', // Default avatar for now
-        location: 'Vietnam',
+        location: location.value || '',
         images: [...previews.value], // In a real app, these would be uploaded URLs
         likes: 0,
         caption: caption.value,

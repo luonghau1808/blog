@@ -182,7 +182,7 @@
                         <img :src="post.userAvatar" class="rounded-circle me-2" width="42" height="42" />
                         <div class="flex-grow-1">
                             <div class="fw-bold">{{ post.user }}</div>
-                            <small class="text-muted">{{ post.location }}</small>
+                            <small class="text-muted" v-if="post.location">{{ post.location }}</small>
                         </div>
                         <div class="position-relative">
                             <button class="btn btn-link p-0" @click="togglePostMenu(post.id)">•••</button>
@@ -202,7 +202,7 @@
                         </div>
                     </div>
 
-                    <div class="post-image position-relative" @touchstart.passive="onTouchStart($event, post)"
+                    <div class="post-image position-relative" v-if="(post.images && post.images.length) || post.image" @touchstart.passive="onTouchStart($event, post)"
                         @touchend.passive="onTouchEnd($event, post)">
                         <img :src="(post.images && post.images.length) ? post.images[(imageIndex[post.id] || 0)] : post.image"
                             class="post-image w-100" alt="post image" />
@@ -260,7 +260,7 @@
                         </div>
 
                         <div class="text-muted small mt-2">
-                            {{ post.time }}
+                            {{ post.createdAt ? timeAgo(post.createdAt) : post.time }}
                         </div>
                         <div class="mt-3">
                             <div v-for="c in displayedComments(post)" :key="c.id" class="mb-2 d-flex align-items-start">
@@ -276,18 +276,14 @@
                                                 @click="cancelEditComment(post, c.id)">Hủy</button>
                                         </div>
                                     </template>
-                                    <template v-else>
-                                        <strong>{{ c.user }}</strong>
-                                        <span class="ms-1">{{ c.content }}</span>
-                                        <div class="text-muted small">{{ timeAgo(c.createdAt) }}</div>
-                                    </template>
+                               
                                 </div>
-                                <div v-if="c.user === me.username" class="position-relative ms-2">
+                                <div v-if="c.user === me.username || post.user === me.username" class="position-relative ms-2">
                                     <button class="btn btn-link p-0" @click="toggleCommentMenu(post, c.id)">•••</button>
                                     <div v-if="isCommentMenuOpen(post, c.id)" class="card position-absolute"
                                         style="top: 20px; right: 0; z-index: 50; min-width: 140px;">
                                         <div class="list-group list-group-flush">
-                                            <button class="list-group-item list-group-item-action"
+                                            <button v-if="c.user === me.username" class="list-group-item list-group-item-action"
                                                 @click="startEditComment(post, c.id)">Chỉnh
                                                 sửa</button>
                                             <button class="list-group-item list-group-item-action text-danger"
@@ -335,7 +331,7 @@
                                 <div class="fw-bold small">{{ s.user }}</div>
                                 <div class="small text-muted">Gợi ý</div>
                             </div>
-                            <button class="btn btn-sm btn-link text-primary">Theo dõi</button>
+                            <button class="btn btn-sm btn-link text-primary">Kết bạn</button>
                         </div>
                     </div>
 
@@ -395,6 +391,7 @@ const staticPosts = [
         likes: 213,
         caption: "Một ngày đẹp trời",
         time: "2 giờ",
+        createdAt: Date.now() - 2 * 60 * 60 * 1000,
         liked: false,
         comments: [
             { id: 1, user: "minh", content: "Ảnh đẹp quá!", createdAt: Date.now() - 5 * 60 * 1000 }
@@ -409,6 +406,7 @@ const staticPosts = [
         likes: 102,
         caption: "Not perfect, but perfectly me 🧝🏻‍♀️✨",
         time: "6 giờ",
+        createdAt: Date.now() - 6 * 60 * 60 * 1000,
         liked: false,
         comments: []
     },
@@ -488,27 +486,14 @@ function onTouchEnd(e, post) {
 }
 
 const suggestions = [
-    { id: 1, user: "_.anhph", avatar: '/img32.jpg' },
-    { id: 2, user: "minh", avatar: '/img10.jpg' },
-    { id: 3, user: "2minhu1._", avatar: '/img20.jpg' },
+    { id: 1, user: "Kim Anh", avatar: '/img32.jpg' },
+    { id: 2, user: "Lam Anh", avatar: '/img10.jpg' },
+    { id: 3, user: "Ng An", avatar: '/img20.jpg' },
 ];
 
 function toggleLike(post) {
     // Ensure likes is a number
     if (typeof post.likes !== 'number') post.likes = 0;
-    
-    // Check if user already liked this post
-    // In a real app, we would check against a list of user IDs who liked the post.
-    // For this demo, we'll use a local property 'liked' on the post object, 
-    // but to persist it correctly across reloads for the *current user*, 
-    // we should ideally store a list of users who liked it.
-    // However, since the prompt asks for "mỗi người chỉ được ấn 1 lần" (each person can only click once),
-    // and "sau khi chạy lại thì vẫn hiện bài viết đã tim" (persist after reload),
-    // we need to modify the data structure slightly or assume 'liked' property is per-user context (which is tricky with shared localStorage).
-    
-    // BETTER APPROACH for this demo:
-    // We will add a 'likedBy' array to the post if it doesn't exist.
-    // We will check if the current user's username is in that array.
     
     const username = me.username;
     if (!post.likedBy) post.likedBy = [];
@@ -593,7 +578,7 @@ function goToPost(post) {
 
 function reportPost(post) {
     const ok = window.confirm('Bạn muốn báo cáo bài viết này?')
-    if (ok) alert('Đã gửi báo cáo (demo)')
+    if (ok) alert('Đã gửi báo cáo')
     closePostMenu(post.id)
 }
 
@@ -604,18 +589,38 @@ function addComment(post) {
     const c = { id: nextId, user: me.username, content: t, createdAt: Date.now() }
     post.comments = [...(post.comments || []), c]
     newCommentText[post.id] = ''
+
+    // Update localStorage
+    const storedPosts = JSON.parse(localStorage.getItem('posts') || '[]');
+    const index = storedPosts.findIndex(p => p.id === post.id);
+    if (index !== -1) {
+        storedPosts[index] = { ...storedPosts[index], comments: post.comments };
+        localStorage.setItem('posts', JSON.stringify(storedPosts));
+        // Dispatch event to sync
+        window.dispatchEvent(new Event('post-created'));
+    }
 }
 
 function deleteComment(post, commentId) {
     const list = post.comments || []
     const target = list.find(c => c.id === commentId)
-    if (!target || target.user !== me.username) return
+    // Allow if user is comment author OR user is post owner
+    const isOwner = post.user === me.username
+    const isAuthor = target && target.user === me.username
+    if (!target || (!isAuthor && !isOwner)) return
     post.comments = list.filter(c => c.id !== commentId)
+
+    // Update localStorage
+    const storedPosts = JSON.parse(localStorage.getItem('posts') || '[]');
+    const index = storedPosts.findIndex(p => p.id === post.id);
+    if (index !== -1) {
+        storedPosts[index] = { ...storedPosts[index], comments: post.comments };
+        localStorage.setItem('posts', JSON.stringify(storedPosts));
+        // Dispatch event to sync
+        window.dispatchEvent(new Event('post-created'));
+    }
 }
 
-function toggleComments(post) {
-    commentExpanded[post.id] = !commentExpanded[post.id]
-}
 
 function displayedComments(post) {
     const expanded = !!commentExpanded[post.id]
@@ -673,6 +678,16 @@ function saveEditComment(post, commentId) {
     target.content = text
     const editMap = commentEditing[post.id] || {}
     commentEditing[post.id] = { ...editMap, [commentId]: false }
+
+    // Update localStorage
+    const storedPosts = JSON.parse(localStorage.getItem('posts') || '[]');
+    const index = storedPosts.findIndex(p => p.id === post.id);
+    if (index !== -1) {
+        storedPosts[index] = { ...storedPosts[index], comments: post.comments };
+        localStorage.setItem('posts', JSON.stringify(storedPosts));
+        // Dispatch event to sync
+        window.dispatchEvent(new Event('post-created'));
+    }
 }
 
 function cancelEditComment(post, commentId) {
