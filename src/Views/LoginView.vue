@@ -2,34 +2,42 @@
     <div class="login-page d-flex align-items-center justify-content-center vh-100">
         <div class="container">
             <div class="row justify-content-center gx-5">
-                <!-- Left - Promo / Brand -->
+
+                <!-- Left side -->
                 <div class="col-lg-6 d-none d-lg-flex flex-column justify-content-center text-white promo">
                     <h2 class="display-4 fw-bold">Kết nối với bạn bè và thế giới xung quanh bạn.</h2>
-                    <p class="lead mt-4 ">Xem những gì đang diễn ra trong cộng đồng của bạn ngay bây giờ.</p>
+                    <p class="lead mt-4">Xem những gì đang diễn ra trong cộng đồng của bạn ngay bây giờ.</p>
                 </div>
-                <!-- Right - Login card -->
+
+                <!-- Login form -->
                 <div class="col-12 col-lg-4">
                     <div class="card shadow-sm rounded-3">
                         <div class="card-body p-4">
+
                             <div class="text-center mb-3">
-                                <img src="/logo.png
-                                " alt="Logo" class="brand-circle mb-2" />
+                                <img src="/logo.png" alt="Logo" class="brand-circle mb-2" />
                                 <h5 class="mb-0">Đăng nhập</h5>
-                                <small class="text-muted d-block"></small>
                             </div>
 
-                            <form @submit.prevent="handleLogin" novalidate>
+                            <form @submit.prevent="handleLogin">
                                 <div class="mb-3">
-                                    <input v-model="email" type="email" class="form-control"
-                                        placeholder="Email hoặc số điện thoại" :class="{ 'is-invalid': emailError }"
-                                        required />
+                                    <input
+                                        v-model="email"
+                                        class="form-control"
+                                        placeholder="Email hoặc số điện thoại"
+                                        :class="{ 'is-invalid': emailError }"
+                                    />
                                     <div class="invalid-feedback">{{ emailError }}</div>
                                 </div>
 
                                 <div class="mb-2 position-relative">
-                                    <input v-model="password" :type="showPassword ? 'text' : 'password'"
-                                        class="form-control" placeholder="Nhập mật khẩu"
-                                        :class="{ 'is-invalid': passwordError }" required />
+                                    <input
+                                        v-model="password"
+                                        :type="showPassword ? 'text' : 'password'"
+                                        class="form-control"
+                                        placeholder="Nhập mật khẩu"
+                                        :class="{ 'is-invalid': passwordError }"
+                                    />
                                     <button type="button" class="btn btn-sm toggle-pass"
                                         @click="showPassword = !showPassword">
                                         {{ showPassword ? 'Ẩn' : 'Hiện' }}
@@ -38,25 +46,30 @@
                                 </div>
 
                                 <div class="d-grid mb-3">
-                                    <button type="submit" class="btn btn-primary fw-semibold">Đăng nhập</button>
+                                    <button class="btn btn-primary fw-semibold" type="submit">
+                                        Đăng nhập
+                                    </button>
                                 </div>
 
                                 <div class="text-center mb-3">
-                                    <a href="#" @click.prevent="forgotPassword" class="text-decoration-none small">Quên
-                                        mật khẩu?</a>
+                                    <a href="#" @click.prevent="forgotPassword" class="small text-decoration-none">
+                                        Quên mật khẩu?
+                                    </a>
                                 </div>
 
                                 <hr />
 
                                 <div class="d-grid">
-                                    <router-link :to="{ name: 'Resigter' }" class="btn btn-success fw-semibold"
-                                        @click.prevent="">Tạo tài khoản mới</router-link>
+                                    <router-link :to="{ name: 'Resigter' }" class="btn btn-success fw-semibold">
+                                        Tạo tài khoản mới
+                                    </router-link>
                                 </div>
                             </form>
+
                         </div>
                     </div>
-
                 </div>
+
             </div>
         </div>
     </div>
@@ -64,51 +77,76 @@
 
 <script setup>
 import { ref } from 'vue'
+import axios from 'axios'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
+const API = "http://localhost:3000/users"
 
-const email = ref('')
-const password = ref('')
+const email = ref("")
+const password = ref("")
 const showPassword = ref(false)
-const emailError = ref('')
-const passwordError = ref('')
 
-function validate() {
-    emailError.value = ''
-    passwordError.value = ''
-    if (!email.value) emailError.value = 'Vui lòng nhập email hoặc số điện thoại.'
-    if (!password.value) passwordError.value = 'Vui lòng nhập mật khẩu.'
-    return !emailError.value && !passwordError.value
+// Error messages
+const emailError = ref("")
+const passwordError = ref("")
+
+// Reset errors
+function resetErrors() {
+    emailError.value = ""
+    passwordError.value = ""
 }
 
-function handleLogin() {
-    if (!validate()) return
-    
-    const users = JSON.parse(localStorage.getItem('users') || '[]')
-    const user = users.find(u => u.contact === email.value && u.password === password.value)
+function validate() {
+    resetErrors()
+    let ok = true
 
-    if (user) {
-        // Login success
-        localStorage.setItem('currentUser', JSON.stringify(user))
-        alert('Đăng nhập thành công!')
-        router.push({ name: 'Home' })
-    } else {
-        // Login failed
-        passwordError.value = 'Thông tin đăng nhập không chính xác.'
+    if (!email.value.trim()) {
+        emailError.value = "Vui lòng nhập email hoặc số điện thoại."
+        ok = false
     }
+    if (!password.value.trim()) {
+        passwordError.value = "Vui lòng nhập mật khẩu."
+        ok = false
+    }
+
+    return ok
+}
+
+async function handleLogin() {
+    if (!validate()) return
+
+    try {
+        // 🔎 Tìm user trong Fake API
+        const res = await axios.get(`${API}?contact=${email.value}&password=${password.value}`)
+
+        if (res.data.length > 0) {
+            const user = res.data[0]
+
+            // ✔ Lưu phiên đăng nhập
+            localStorage.setItem("currentUser", JSON.stringify(user))
+
+            alert("Đăng nhập thành công!")
+            router.push({ name: "Home" })
+
+        } else {
+            passwordError.value = "Email hoặc mật khẩu không chính xác."
+        }
+    } catch (error) {
+        alert("Đã có lỗi xảy ra. Vui lòng thử lại sau.")
+        console.error(error)
+    }
+   
 }
 
 function forgotPassword() {
-    alert('Chức năng quên mật khẩu chưa được hỗ trợ.')
+    alert("Chức năng quên mật khẩu chưa được hỗ trợ.")
 }
-
 </script>
 
 <style scoped>
 .login-page {
     background: linear-gradient(180deg, #5094ec 0%, #304864 100%);
-    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
     padding: 2rem 0;
 }
 
@@ -119,40 +157,20 @@ function forgotPassword() {
 .brand-circle {
     width: 64px;
     height: 64px;
-    background-color: #f4f9ff;
+    background: #f4f9ff;
     border-radius: 50%;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-weight: 700;
-    font-size: 40px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, .15);
 }
 
-/* Slightly customize card for a "social" feel */
-.card {
-    border: none;
-}
-
-/* Toggle password button inside input */
 .toggle-pass {
     position: absolute;
     top: 6px;
     right: 6px;
-    padding: 0.25rem 0.5rem;
-    font-size: 0.8rem;
-    border: none;
     background: transparent;
-}
-
-/* Responsive tweaks */
-@media (max-width: 991.98px) {
-    .promo {
-        display: none;
-    }
-
-    .brand-circle {
-        margin: 0 auto;
-    }
+    border: none;
+    font-size: 0.8rem;
 }
 </style>

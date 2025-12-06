@@ -198,9 +198,9 @@
                                 <!-- Likes and Caption -->
                                 <div class="px-2 pb-2">
                                     <div class="fw-bold mb-1">{{ post.likes }} lượt thích</div>
-                                    <!-- <div class="text-muted small mb-2" v-if="post.comments && post.comments.length" @click="post.showComments = !post.showComments" style="cursor: pointer;">
+                                    <div class="text-muted small mb-2" v-if="post.comments && post.comments.length" @click="goToPost(post)" style="cursor: pointer;">
                                         Xem tất cả {{ post.comments.length }} bình luận
-                                    </div> -->
+                                    </div>
                                 </div>
 
                                 <!-- Comments List Removed -->
@@ -233,8 +233,8 @@
                             <div class="card-body">
                                 <h6 class="card-title">Ảnh</h6>
                                 <div class="row g-2">
-                                    <div class="col-4" v-for="p in photos" :key="p">
-                                        <img :src="p" class="img-fluid rounded" alt="photo" />
+                                    <div class="col-4" v-for="p in photos.slice(0, 6)" :key="p">
+                                        <img :src="p" class="img-fluid rounded photo-item" alt="photo" />
                                     </div>
                                 </div>
                                 <a href="#" class="d-block text-decoration-none mt-2" @click.prevent="activeTab = 'Ảnh'">Xem tất cả</a>
@@ -278,7 +278,7 @@
                                 <h5>Ảnh của bạn</h5>
                                 <div class="row g-2">
                                     <div class="col-3 mb-2" v-for="p in photos" :key="p">
-                                        <img :src="p" class="img-fluid rounded" alt="photo" />
+                                        <img :src="p" class="img-fluid rounded photo-item" alt="photo" />
                                     </div>
                                 </div>
                                 <a href="#" class="d-block text-decoration-none mt-2">Xem tất cả ảnh</a>
@@ -301,6 +301,7 @@
 
 <script>
 import PostComposer from "@/Views/PostComposer.vue";
+import api from "@/services/api";
 
 export default {
     name: "ProfileView",
@@ -332,46 +333,8 @@ export default {
                 { id: 1, name: "Lê Thị Ngọc Anh", avatar: "img27.jpg", mutual: 3 },
                 { id: 2, name: "Trần Thị Linh", avatar: "img23.jpg", mutual: 2 },
             ],
-            photos: ["/img18.jpg", "/img19.jpg", "/img20.jpg", "/img21.jpg", "/img22.jpg"],
-            posts: [], // Will be loaded
-            staticPosts: [
-                {
-                    id: 1,
-                    user: { name: "Ng Thi Luong Hau", avatar: "/img01.jpg" },
-                    time: "2 hrs",
-                    createdAt: Date.now() - 2 * 60 * 60 * 1000,
-                    content: "Một khoảnh khắc tuyệt vời từ chuyến đi gần đây",
-                    image: "/img21.jpg",
-                    images: ["/img19.jpg", "/img20.jpg", "/img21.jpg", "/img22.jpg","/img18.jpg"],
-                    likes: 34,
-                    comments: [
-                         { id: 1, user: "Lê Huyền", content: "Xinh quá nè!", createdAt: Date.now() - 3600000 },
-                         { id: 2, user: "Đào Ánh Hà", content: "Tuyệt vời!", createdAt: Date.now() - 1800000 }
-                    ],
-                    newComment: "",
-                    showComments: false,
-                    showMenu: false,
-                    liked: false,
-                    hidden: false
-
-                },
-                {
-                    id: 2,
-                    user: { name: "Ng Thi Luong Hau", avatar: "/img01.jpg" },
-                    time: "Yesterday",
-                    createdAt: Date.now() - 24 * 60 * 60 * 1000,
-                    content: "hehe.",
-                    image: null,
-                    images: [],
-                    likes: 12,
-                    comments: [],
-                    newComment: "",
-                    showComments: false,
-                    showMenu: false,
-                    liked: false,
-                    hidden: false
-                },
-            ],
+            photos: [],
+            posts: [],
             imageIndex: {},
             commentMenuOpen: {},
         };
@@ -398,87 +361,146 @@ export default {
                 }
             }
         },
-        loadPosts() {
-            const storedPosts = JSON.parse(localStorage.getItem('posts') || '[]');
-            // Filter posts for current user.
-            // Note: The stored posts structure is slightly different (user is a string name),
-            // while static posts use an object. We need to normalize or handle both.
-            // For this demo, we assume stored posts with matching user name belong to this profile.
-            
-            const myStoredPosts = storedPosts.filter(p => p.user === this.user.name).map(p => ({
-                ...p,
-                user: { name: p.user, avatar: p.userAvatar || this.user.avatar }, // Normalize structure
-                image: (p.images && p.images.length) ? p.images[0] : null, // Normalize image
-                showMenu: false,
-                showComments: false,
-                newComment: ""
-            }));
+        async loadPosts() {
+            try {
+                // Fetch all posts and filter client-side to ensure robust matching
+                const res = await api.get('/posts');
+                const apiPosts = res.data || [];
+                
+                const myApiPosts = apiPosts
+                    .filter(p => p.user === this.user.name)
+                    .map(p => ({
+                        ...p,
+                        user: { name: p.user, avatar: p.userAvatar || this.user.avatar },
+                        image: (p.images && p.images.length) ? p.images[0] : (p.image || null),
+                        showMenu: false,
+                        showComments: false,
+                        newComment: "",
+                        // Ensure arrays rely on API data, default to empty
+                        comments: p.comments || [],
+                        likes: p.likes || 0,
+                        liked: p.likedBy ? p.likedBy.includes(this.user.name) : false
+                    }));
+                
+                // Sort descending by createdAt
+                myApiPosts.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+                this.posts = myApiPosts;
 
-            this.posts = [...myStoredPosts, ...this.staticPosts];
+                // Update photos from posts
+                const collectedPhotos = [];
+                this.posts.forEach(p => {
+                    if (p.images && Array.isArray(p.images) && p.images.length > 0) {
+                        collectedPhotos.push(...p.images);
+                    } else if (p.image) {
+                        collectedPhotos.push(p.image);
+                    }
+                });
+                // Merge with static photos (newest post photos first)
+                this.photos = [...collectedPhotos];
+            } catch (err) {
+                console.error("Error loading posts from API:", err);
+            }
         },
-        addPost() {
+        async addPost() {
             if (!this.newPost.trim()) return;
             
             const newPost = {
-                id: Date.now(),
+                id: Date.now().toString(), // Use string ID for consistency
                 user: this.user.name,
                 userAvatar: this.user.avatar,
                 location: this.user.location,
                 images: [],
                 likes: 0,
+                likedBy: [],
                 caption: this.newPost,
+                content: this.newPost, // Duplicate for compatibility
                 time: "Vừa xong",
-                liked: false,
                 comments: [],
                 createdAt: Date.now()
             };
 
-            // Save to localStorage
-            const existingPosts = JSON.parse(localStorage.getItem('posts') || '[]');
-            existingPosts.unshift(newPost);
-            localStorage.setItem('posts', JSON.stringify(existingPosts));
-
-            // Dispatch event
-            window.dispatchEvent(new Event('post-created'));
-
-            this.newPost = "";
+            try {
+                await api.post('/posts', newPost);
+                this.newPost = "";
+                this.loadPosts(); // Reload to refresh list
+                window.dispatchEvent(new Event('post-created'));
+            } catch (e) {
+                console.error("Error creating post:", e);
+                alert("Không thể đăng bài. Vui lòng thử lại.");
+            }
         },
         toggleMenu(post) {
             this.posts.forEach(p => p.showMenu = false);
             post.showMenu = !post.showMenu;
         },
-        editPost(post) {
-            const newText = prompt("Nhập nội dung mới:", post.content || post.caption); // Handle both structures
-            if (newText) {
+        async editPost(post) {
+            const newText = prompt("Nhập nội dung mới:", post.content || post.caption);
+            if (newText !== null) {
+                const updatedFields = {
+                    content: newText,
+                    caption: newText
+                };
+                
+                // Optimistic update
                 post.content = newText;
                 post.caption = newText;
-            }
-            post.showMenu = false;
-        },
-        deletePost(post) {
-            if (confirm("Bạn có chắc muốn xóa bài viết?")) {
-                this.posts = this.posts.filter(p => p.id !== post.id);
-                // Also remove from localStorage if it exists there
-                let existingPosts = JSON.parse(localStorage.getItem('posts') || '[]');
-                const initialLen = existingPosts.length;
-                existingPosts = existingPosts.filter(p => p.id !== post.id);
-                if (existingPosts.length !== initialLen) {
-                     localStorage.setItem('posts', JSON.stringify(existingPosts));
-                     window.dispatchEvent(new Event('post-created'));
+                post.showMenu = false;
+
+                try {
+                    await api.patch(`/posts/${post.id}`, updatedFields);
+                    window.dispatchEvent(new Event('post-created'));
+                } catch (e) {
+                    console.error("Error updating post:", e);
+                    alert("Cập nhật thất bại");
+                    this.loadPosts(); // Revert
                 }
             }
         },
-        hidePost(post) {
+        async deletePost(post) {
+            if (confirm("Bạn có chắc muốn xóa bài viết?")) {
+                try {
+                    await api.delete(`/posts/${post.id}`);
+                    this.posts = this.posts.filter(p => p.id !== post.id);
+                    window.dispatchEvent(new Event('post-created'));
+                } catch (e) {
+                    console.error("Error deleting post:", e);
+                    alert("Xóa thất bại");
+                }
+            }
+        },
+        async hidePost(post) {
             post.hidden = true;
             post.showMenu = false;
+            // "Hide" is usually local only, unless we have a 'hidden' field in DB
         },
-        addComment(post) {
+        async addComment(post) {
             const t = (post.newComment || '').trim();
             if (!t) return;
-            const nextId = (post.comments && post.comments.length ? Math.max(...post.comments.map(c => c.id)) + 1 : 1);
-            const c = { id: nextId, user: this.user.name, content: t, createdAt: Date.now() };
-            post.comments = [...(post.comments || []), c];
+            
+            const nextId = Date.now().toString(36) + Math.random().toString(36).substr(2);
+            const c = { 
+                id: nextId, 
+                user: this.user.name, 
+                content: t, 
+                createdAt: Date.now(),
+                likes: 0,
+                likedBy: [],
+                replies: []
+            };
+            
+            // Optimistic update
+            const updatedComments = [...(post.comments || []), c];
+            post.comments = updatedComments;
             post.newComment = '';
+
+            try {
+                await api.patch(`/posts/${post.id}`, { comments: updatedComments });
+                window.dispatchEvent(new Event('post-created'));
+            } catch (e) {
+                console.error("Error adding comment:", e);
+                alert("Không thể gửi bình luận");
+                this.loadPosts(); // Revert
+            }
         },
         prevImage(post) {
             const id = post.id;
@@ -500,13 +522,14 @@ export default {
             if (!imgs.length) return;
             this.imageIndex[id] = i % imgs.length;
         },
-        toggleLike(post) {
+        async toggleLike(post) {
             if (typeof post.likes !== 'number') post.likes = 0;
             const username = this.user.name;
             if (!post.likedBy) post.likedBy = [];
             
             const alreadyLiked = post.likedBy.includes(username);
             
+            // Optimistic update
             if (alreadyLiked) {
                 post.likes--;
                 post.likedBy = post.likedBy.filter(u => u !== username);
@@ -517,13 +540,16 @@ export default {
                 post.liked = true;
             }
             
-            // Save to local storage
-            const storedPosts = JSON.parse(localStorage.getItem('posts') || '[]');
-            const index = storedPosts.findIndex(p => p.id === post.id);
-            if (index !== -1) {
-                storedPosts[index] = { ...storedPosts[index], likes: post.likes, likedBy: post.likedBy };
-                localStorage.setItem('posts', JSON.stringify(storedPosts));
+            try {
+                await api.patch(`/posts/${post.id}`, {
+                    likes: post.likes,
+                    likedBy: post.likedBy
+                });
                 window.dispatchEvent(new Event('post-created'));
+            } catch (e) {
+                console.error("Error toggling like:", e);
+                // Revert
+                this.loadPosts(); 
             }
         },
         timeAgo(ts) {
@@ -556,36 +582,33 @@ export default {
         canReportComment(comment) {
             return comment.user !== this.user.name;
         },
-        deleteComment(post, comment) {
+        async deleteComment(post, comment) {
             if (!confirm("Bạn có chắc muốn xóa bình luận này?")) return;
             
-            post.comments = post.comments.filter(c => c.id !== comment.id);
-            this.commentMenuOpen[post.id][comment.id] = false;
+            // Optimistic update
+            const updatedComments = post.comments.filter(c => c.id !== comment.id);
+            post.comments = updatedComments;
+            if (this.commentMenuOpen[post.id]) {
+                this.commentMenuOpen[post.id][comment.id] = false;
+            }
 
-            // Update localStorage
-            const storedPosts = JSON.parse(localStorage.getItem('posts') || '[]');
-            const index = storedPosts.findIndex(p => p.id === post.id);
-            if (index !== -1) {
-                storedPosts[index] = { ...storedPosts[index], comments: post.comments };
-                localStorage.setItem('posts', JSON.stringify(storedPosts));
+            try {
+                await api.patch(`/posts/${post.id}`, { comments: updatedComments });
                 window.dispatchEvent(new Event('post-created'));
+            } catch (e) {
+                console.error("Error deleting comment:", e);
+                this.loadPosts();
             }
         },
         goToPost(post) {
             const payload = { ...post, currentImageIndex: (this.imageIndex[post.id] || 0) };
             try { sessionStorage.setItem('selectedPost', JSON.stringify(payload)); } catch (err) {
                 console.error(err);
-                alert('Đã có lỗi xảy ra khi lưu bài viết');
             }
             this.$router.push({ name: 'Post', params: { id: String(post.id) } });
         },
         reportComment(comment) {
             alert(`Đã báo cáo bình luận của ${comment.user}`);
-            // Close menu (need post id, but here we just iterate or pass it)
-            // Ideally we pass post to reportComment too, but for now just alert.
-            // To close menu we need to find it.
-            // Let's just leave it open or close all?
-            // Simple fix: pass post to reportComment
         },
     },
 };
@@ -757,5 +780,11 @@ export default {
 
 .post-image .dot.active {
     background: #fff;
+}
+
+.photo-item {
+    width: 100%;
+    aspect-ratio: 1/1;
+    object-fit: cover;
 }
 </style>

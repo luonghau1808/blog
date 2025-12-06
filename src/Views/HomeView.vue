@@ -178,128 +178,176 @@
                 <!-- Posts -->
 
                 <div v-for="post in posts" :key="post.id" class="card mb-4">
-                    <div class="card-body p-2 d-flex align-items-center ">
-                        <img :src="post.userAvatar" class="rounded-circle me-2" width="42" height="42" />
-                        <div class="flex-grow-1">
-                            <div class="fw-bold">{{ post.user }}</div>
-                            <small class="text-muted" v-if="post.location">{{ post.location }}</small>
+                    <div class="card-header bg-white border-0 py-3 d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center">
+                            <img :src="post.userAvatar" class="rounded-circle border me-3" width="32" height="32"
+                                style="object-fit: cover;" />
+                            <div>
+                                <div class="d-flex align-items-center">
+                                    <span class="fw-bold text-dark me-1" style="font-size: 14px;">{{ post.user }}</span>
+                                    <span class="text-muted mx-1" style="font-size: 12px;">•</span>
+                                    <span class="text-muted" style="font-size: 14px;">{{ post.createdAt ?
+                                        timeAgo(post.createdAt) : post.time }}</span>
+                                    <span class="text-muted mx-1" style="font-size: 12px;">•</span>
+                                    
+                                </div>
+                                <div class="text-muted small" style="font-size: 12px; line-height: 1;">{{ post.location
+                                    || '' }}</div>
+                            </div>
                         </div>
                         <div class="position-relative">
-                            <button class="btn btn-link p-0" @click="togglePostMenu(post.id)">•••</button>
-                            <div v-if="isPostMenuOpen(post.id)" class="card position-absolute"
-                                style="top: 28px; right: 8px; z-index: 60; min-width: 180px;">
-                                <div class="list-group list-group-flush">
-                                    <button class="list-group-item list-group-item-action"
+                            <button class="btn btn-link text-dark p-0" @click="togglePostMenu(post.id)">
+                                <svg aria-label="Tùy chọn khác" class="x1lliihq x1n2onr6 x5n08af" fill="currentColor" height="24" role="img" viewBox="0 0 24 24" width="24">
+                                    <circle cx="12" cy="12" r="1.5"></circle>
+                                    <circle cx="6" cy="12" r="1.5"></circle>
+                                    <circle cx="18" cy="12" r="1.5"></circle>
+                                </svg>
+                            </button>
+                            <div v-if="isPostMenuOpen(post.id)" class="card position-absolute shadow-sm"
+                                style="top: 30px; right: 0; z-index: 100; min-width: 200px; border-radius: 12px; overflow: hidden;">
+                                <div class="list-group list-group-flush text-center">
+                                    <button class="list-group-item list-group-item-action text-danger fw-bold py-3"
+                                        style="font-size: 14px;" @click="reportPost(post)">Báo cáo</button>
+                                    <button class="list-group-item list-group-item-action text-danger fw-bold py-3"
+                                        style="font-size: 14px;">Bỏ theo dõi</button>
+                                    <button class="list-group-item list-group-item-action py-3" style="font-size: 14px;"
+                                        @click="goToPost(post)">Đi tới bài viết</button>
+                                    <button class="list-group-item list-group-item-action py-3" style="font-size: 14px;"
                                         @click="copyPostLink(post)">Sao chép liên kết</button>
-                                    <button class="list-group-item list-group-item-action" @click="goToPost(post)">Đi
-                                        đến bài viết</button>
-                                    <button class="list-group-item list-group-item-action text-danger"
-                                        @click="reportPost(post)">Báo cáo</button>
-                                    <button class="list-group-item list-group-item-action"
+                                    <button class="list-group-item list-group-item-action py-3" style="font-size: 14px;"
                                         @click="closePostMenu(post.id)">Hủy</button>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="post-image position-relative" v-if="(post.images && post.images.length) || post.image" @touchstart.passive="onTouchStart($event, post)"
-                        @touchend.passive="onTouchEnd($event, post)">
-                        <img :src="(post.images && post.images.length) ? post.images[(imageIndex[post.id] || 0)] : post.image"
-                            class="post-image w-100" alt="post image" />
+                    <!-- Post Image -->
+                    <!-- Post Image (Scroll Snap Carousel) -->
+                    <div class="post-image position-relative" v-if="(post.images && post.images.length) || post.image">
+                        <div :id="`carousel-${post.id}`" 
+                             class="d-flex w-100" 
+                             style="overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; scrollbar-width: none;"
+                             @scroll="onScroll($event, post.id)">
+                            
+                            <template v-if="post.images && post.images.length">
+                                <img v-for="(img, index) in post.images" :key="index"
+                                     :src="img" 
+                                     class="d-block w-100 flex-shrink-0" 
+                                     style="scroll-snap-align: start; object-fit: cover;" 
+                                     alt="post image" />
+                            </template>
+                            <img v-else :src="post.image" 
+                                 class="d-block w-100 flex-shrink-0" 
+                                 style="scroll-snap-align: start; object-fit: cover;" 
+                                 alt="post image" />
+                        </div>
 
-                        <button v-if="post.images && post.images.length > 1" class="carousel-prev"
-                            @click="prevImage(post)" aria-label="Previous image">‹</button>
-                        <button v-if="post.images && post.images.length > 1" class="carousel-next"
-                            @click="nextImage(post)" aria-label="Next image">›</button>
+                        <!-- Controls -->
+                        <button v-if="post.images && post.images.length > 1" 
+                                class="carousel-btn prev"
+                                @click="scrollCarousel(post.id, -1)" 
+                                aria-label="Previous image"
+                                v-show="(imageIndex[post.id] || 0) > 0">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-left" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z" />
+                            </svg>
+                        </button>
+                        
+                        <button v-if="post.images && post.images.length > 1" 
+                                class="carousel-btn next"
+                                @click="scrollCarousel(post.id, 1)" 
+                                aria-label="Next image"
+                                v-show="(imageIndex[post.id] || 0) < post.images.length - 1">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-right" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z" />
+                            </svg>
+                        </button>
 
-                        <div v-if="post.images && post.images.length > 1" class="image-dots">
+                        <div v-if="post.images && post.images.length > 1" class="image-dots-overlay">
                             <span v-for="(img, i) in post.images" :key="i"
-                                :class="['dot', { active: i === (imageIndex[post.id] || 0) }]"
-                                @click="gotoImage(post, i)"></span>
+                                :class="['dot', { active: i === (imageIndex[post.id] || 0) }]">
+                            </span>
                         </div>
                     </div>
 
-                    <div class="card-body">
-                        <div class="d-flex align-items-center mb-2">
-                            <button class="btn btn-link p-0 me-3" @click="toggleLike(post)">
-                                <svg v-if="!post.liked" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                    fill="none" stroke="currentColor" stroke-width="2" class="bi bi-heart">
-                                    <path
-                                        d="M20.8 4.6a5.6 5.6 0 0 0-7.9 0L12 5.5l-0.9-0.9a5.6 5.6 0 0 0-7.9 7.9L12 22.1l8.8-9.7a5.6 5.6 0 0 0 0-7.9z" />
-                                </svg>
-                                <svg v-else xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#e74c3c"
-                                    viewBox="0 0 24 24">
-                                    <path
-                                        d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 6 3.99 4 6.5 4c1.74 0 3.41.81 4.5 2.09C12.09 4.81 13.76 4 15.5 4 18.01 4 20 6 20 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-                                </svg>
-                            </button>
-
-                            <button class="btn btn-link p-0 me-3" @click="goToPost(post)">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none"
-                                    stroke="currentColor" stroke-width="2" class="bi bi-chat">
-                                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2z" />
-                                </svg>
-                            </button>
-
-                            <button class="btn btn-link p-0 ms-auto">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none"
-                                    stroke="currentColor" stroke-width="2" class="bi bi-send">
-                                    <path d="M22 2L11 13" />
-                                    <path d="M22 2L15 22l-4-9L2 9l20-7z" />
+                    <div class="card-body px-3 py-2">
+                        <!-- Action Icons -->
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <div class="d-flex align-items-center gap-3">
+                                <button class="btn btn-link p-0 text-dark" @click="toggleLike(post)">
+                                    <svg v-if="!post.liked" aria-label="Thích" class="x1lliihq x1n2onr6 x1roi4f4"
+                                        fill="currentColor" height="24" role="img" viewBox="0 0 24 24" width="24">
+                                        <path
+                                            d="M16.792 3.904A4.989 4.989 0 0 1 21.5 9.122c0 3.072-2.652 4.956-5.197 7.222-2.512 2.243-3.865 3.469-4.303 3.752-.477-.309-2.143-1.823-4.303-3.752C5.141 14.072 2.5 12.167 2.5 9.122a4.989 4.989 0 0 1 4.708-5.218 4.21 4.21 0 0 1 3.675 1.941c.84 1.175.98 1.763 1.12 1.763s.278-.588 1.11-1.766a4.17 4.17 0 0 1 3.679-1.938m0-2a6.04 6.04 0 0 0-4.797 2.127 6.052 6.052 0 0 0-4.787-2.127A6.985 6.985 0 0 0 .5 9.122c0 3.61 2.55 5.827 5.015 7.97.283.246.569.494.853.747l1.027.918a44.998 44.998 0 0 0 3.518 3.018 2 2 0 0 0 2.174 0 45.263 45.263 0 0 0 3.626-3.115l.922-.824c.293-.26.59-.519.885-.774 2.334-2.025 4.98-4.32 4.98-7.94a6.985 6.985 0 0 0-6.708-7.218Z">
+                                        </path>
+                                    </svg>
+                                    <svg v-else aria-label="Bỏ thích" class="x1lliihq x1n2onr6 x1roi4f4 color-red"
+                                        fill="#ff3040" height="24" role="img" viewBox="0 0 48 48" width="24">
+                                        <path
+                                            d="M34.6 3.1c-4.5 0-7.9 1.8-10.6 5.6-2.7-3.7-6.1-5.5-10.6-5.5C6 3.1 0 9.6 0 17.6c0 7.3 5.4 12 10.6 16.5.6.5 1.3 1.1 1.9 1.7l2.3 2c4.4 3.9 6.6 5.9 7.6 6.5.5.3 1.1.5 1.6.5s1.1-.2 1.6-.5c1-.6 2.8-2.2 7.8-6.8l2-1.8c.7-.6 1.3-1.2 2-1.7C42.7 29.6 48 25 48 17.6c0-8-6-14.5-13.4-14.5z">
+                                        </path>
+                                    </svg>
+                                </button>
+                                <button class="btn btn-link p-0 text-dark" @click="goToPost(post)">
+                                    <svg aria-label="Bình luận" class="x1lliihq x1n2onr6 x5n08af" fill="currentColor"
+                                        height="24" role="img" viewBox="0 0 24 24" width="24">
+                                        <path d="M20.656 17.008a9.993 9.993 0 1 0-3.59 3.615L22 22Z" fill="none"
+                                            stroke="currentColor" stroke-linejoin="round" stroke-width="2"></path>
+                                    </svg>
+                                </button>
+                                <button class="btn btn-link p-0 text-dark">
+                                    <svg aria-label="Chia sẻ" class="x1lliihq x1n2onr6 x5n08af" fill="currentColor"
+                                        height="24" role="img" viewBox="0 0 24 24" width="24">
+                                        <line fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="2"
+                                            x1="22" x2="9.218" y1="3" y2="10.083"></line>
+                                        <polygon fill="none" points="11.698 20.334 22 3.001 2 3.001 9.218 10.084 11.698 20.334"
+                                            stroke="currentColor" stroke-linejoin="round" stroke-width="2"></polygon>
+                                    </svg>
+                                </button>
+                            </div>
+                            <button class="btn btn-link p-0 text-dark">
+                                <svg aria-label="Lưu" class="x1lliihq x1n2onr6 x5n08af" fill="currentColor" height="24"
+                                    role="img" viewBox="0 0 24 24" width="24">
+                                    <polygon fill="none" points="20 21 12 13.44 4 21 4 3 20 3 20 21" stroke="currentColor"
+                                        stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></polygon>
                                 </svg>
                             </button>
                         </div>
 
+                        <!-- Likes -->
                         <div class="mb-2">
-                            <strong>{{ post.likes }} lượt thích</strong>
+                            <span class="fw-bold text-dark" style="font-size: 14px;">{{ post.likes }} lượt thích</span>
                         </div>
 
-                        <div>
-                            <strong>{{ post.user }}</strong>
-                            <span class="ms-1">{{ post.caption }}</span>
+                        <!-- Caption -->
+                        <div class="mb-2">
+                            <span class="fw-bold mr-1 me-1" style="font-size: 14px;">{{ post.user }}</span>
+                            <span class="" style="font-size: 14px;"> {{ post.caption }}</span>
                         </div>
 
-                        <div class="text-muted small mt-2">
-                            {{ post.createdAt ? timeAgo(post.createdAt) : post.time }}
+                        <!-- Link to PostView for comments -->
+                        <div class="mb-2" v-if="post.comments && post.comments.length > 0">
+                            <button class="btn btn-link p-0 text-muted text-decoration-none" style="font-size: 14px;"
+                                @click="goToPost(post)">
+                                Xem tất cả {{ post.comments.length }} bình luận
+                            </button>
                         </div>
-                        <div class="mt-3">
-                            <div v-for="c in displayedComments(post)" :key="c.id" class="mb-2 d-flex align-items-start">
-                                <div class="flex-grow-1">
-                                    <template v-if="isEditingComment(post, c.id)">
-                                        <input :value="getCommentEditText(post, c.id)"
-                                            @input="e => setCommentEditText(post, c.id, e.target.value)" type="text"
-                                            class="form-control form-control-sm" />
-                                        <div class="mt-1">
-                                            <button class="btn btn-sm btn-primary me-2"
-                                                @click="saveEditComment(post, c.id)">Lưu</button>
-                                            <button class="btn btn-sm btn-outline-secondary"
-                                                @click="cancelEditComment(post, c.id)">Hủy</button>
-                                        </div>
-                                    </template>
-                               
-                                </div>
-                                <div v-if="c.user === me.username || post.user === me.username" class="position-relative ms-2">
-                                    <button class="btn btn-link p-0" @click="toggleCommentMenu(post, c.id)">•••</button>
-                                    <div v-if="isCommentMenuOpen(post, c.id)" class="card position-absolute"
-                                        style="top: 20px; right: 0; z-index: 50; min-width: 140px;">
-                                        <div class="list-group list-group-flush">
-                                            <button v-if="c.user === me.username" class="list-group-item list-group-item-action"
-                                                @click="startEditComment(post, c.id)">Chỉnh
-                                                sửa</button>
-                                            <button class="list-group-item list-group-item-action text-danger"
-                                                @click="confirmDeleteComment(post, c.id)">Xóa</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="input-group">
-                                <input :value="newCommentText[post.id] || ''"
-                                    @input="e => newCommentText[post.id] = e.target.value" type="text"
-                                    class="form-control" placeholder="Viết bình luận..." />
-                                <button class="btn btn-primary" @click="addComment(post)"
-                                    :disabled="!(newCommentText[post.id] && newCommentText[post.id].trim())">Bình
-                                    luận</button>
-                            </div>
+
+                        <!-- Add Comment -->
+                        <div class="d-flex align-items-center border-top pt-2 mt-2">
+                            <input :value="newCommentText[post.id] || ''"
+                                @input="e => newCommentText[post.id] = e.target.value" type="text"
+                                class="form-control border-0 p-0 shadow-none" placeholder="Bình luận..."
+                                style="font-size: 14px;">
+                            <button class="btn btn-link text-decoration-none p-0 fw-bold ml-2" 
+                                v-if="newCommentText[post.id]"
+                                @click="addComment(post)" 
+                                style="font-size: 14px; color: #0095f6;">Đăng</button>
+                             <button class="btn btn-link text-decoration-none p-0 text-muted ml-2" v-else>
+                                <svg aria-label="Biểu tượng cảm xúc" class="x1lliihq x1n2onr6 x5n08af" fill="currentColor" height="13" role="img" viewBox="0 0 24 24" width="13">
+                                    <path d="M15.83 10.997a1.167 1.167 0 1 0 1.167 1.167 1.167 1.167 0 0 0-1.167-1.167Zm-6.5 1.167a1.167 1.167 0 1 0-1.166 1.167 1.167 1.167 0 0 0 1.166-1.167Zm5.163 3.24a3.406 3.406 0 0 1-4.982.007 1 1 0 1 0-1.557 1.256 5.397 5.397 0 0 0 8.09 0 1 1 0 0 0-1.55-1.263ZM12 .503a11.5 11.5 0 1 0 11.5 11.5A11.513 11.513 0 0 0 12 .503Zm0 21a9.5 9.5 0 1 1 9.5-9.5 9.51 9.51 0 0 1-9.5 9.5Z"></path>
+                                </svg>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -346,13 +394,59 @@
         </div>
     </div>
     <PostComposer v-if="showComposer" @close="showComposer = false" />
+    
+    <!-- ================== DELETE COMMENT MODAL ================== -->
+    <div class="modal fade" :class="{ show: deleteModal.show }" :style="{ display: deleteModal.show ? 'block' : 'none' }" 
+         tabindex="-1" @click.self="closeDeleteModal">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+          <div class="modal-header border-0 pb-0">
+            <h5 class="modal-title fw-bold">
+              <i class="bi bi-exclamation-triangle-fill text-danger me-2"></i>
+              Xóa bình luận
+            </h5>
+            <button type="button" class="btn-close" @click="closeDeleteModal"></button>
+          </div>
+          <div class="modal-body pt-2">
+            <p class="mb-2">Bạn có chắc chắn muốn xóa bình luận này không?</p>
+            <div v-if="deleteModal.comment" class="bg-light rounded p-3 mb-3">
+              <div class="d-flex align-items-start">
+                <div class="rounded-circle me-2 bg-secondary d-flex align-items-center justify-content-center text-white" 
+                     style="width: 32px; height: 32px; min-width: 32px; font-size: 12px;">
+                  <span>{{ deleteModal.comment.user.charAt(0).toUpperCase() }}</span>
+                </div>
+                <div>
+                  <div class="fw-bold small">{{ deleteModal.comment.user }}</div>
+                  <div class="text-muted small" style="word-break: break-word;">{{ deleteModal.comment.content }}</div>
+                </div>
+              </div>
+            </div>
+            <p class="text-muted small mb-0">
+              <i class="bi bi-info-circle me-1"></i>
+              Hành động này không thể hoàn tác.
+            </p>
+          </div>
+          <div class="modal-footer border-0 pt-0">
+            <button type="button" class="btn btn-light" @click="closeDeleteModal">
+              <i class="bi bi-x-circle me-1"></i>Hủy
+            </button>
+            <button type="button" class="btn btn-danger" @click="executeDeleteComment">
+              <i class="bi bi-trash me-1"></i>Xóa bình luận
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Modal backdrop -->
+    <div v-if="deleteModal.show" class="modal-backdrop fade show"></div>
 </template>
 
 <script setup>
 import { reactive, ref } from "vue";
 import PostComposer from "@/Views/PostComposer.vue";
 import { useRouter } from "vue-router";
-
+import api from "@/services/api";
 
 const me = reactive({
     username: "Ng Thi Luong Hau",
@@ -381,55 +475,34 @@ const stories = [
     { id: 6, user: "_dino.makeup", avatar: '/img09.jpg' },
 ];
 
-const staticPosts = [
-    {
-        id: 1,
-        user: "wyn.anh",
-        userAvatar: '/img09.jpg',
-        location: "Hà Nội",
-        images: ['/img08.jpg', '/img09.jpg', '/img10.jpg', '/img07.jpg'],
-        likes: 213,
-        caption: "Một ngày đẹp trời",
-        time: "2 giờ",
-        createdAt: Date.now() - 2 * 60 * 60 * 1000,
-        liked: false,
-        comments: [
-            { id: 1, user: "minh", content: "Ảnh đẹp quá!", createdAt: Date.now() - 5 * 60 * 1000 }
-        ],
-    },
-    {
-        id: 2,
-        user: "buncry3107",
-        userAvatar: '/img11.jpg',
-        location: "Đà Nẵng",
-        images: ['/img12.jpg', '/img13.jpg', '/img11.jpg'],
-        likes: 102,
-        caption: "Not perfect, but perfectly me 🧝🏻‍♀️✨",
-        time: "6 giờ",
-        createdAt: Date.now() - 6 * 60 * 60 * 1000,
-        liked: false,
-        comments: []
-    },
-];
-
 const posts = reactive([]);
 
-function loadPosts() {
-    const storedPosts = JSON.parse(localStorage.getItem('posts') || '[]');
-    // Merge stored posts with static posts. Stored posts come first (newer).
-    // Note: In a real app, you'd fetch everything from an API.
-    const allPosts = [...storedPosts, ...staticPosts];
-    
-    // Update 'liked' state for current user
-    allPosts.forEach(p => {
-        if (p.likedBy && Array.isArray(p.likedBy)) {
-            p.liked = p.likedBy.includes(me.username);
-        } else {
-            p.liked = false;
-        }
-    });
-    
-    posts.splice(0, posts.length, ...allPosts);
+async function loadPosts() {
+    try {
+        const res = await api.get('/posts');
+        const apiPosts = res.data || [];
+
+        // Sort by newst
+        apiPosts.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+        // Update 'liked' state for current user
+        apiPosts.forEach(p => {
+            if (p.likedBy && Array.isArray(p.likedBy)) {
+                p.liked = p.likedBy.includes(me.username);
+            } else {
+                p.liked = false;
+            }
+            // Ensure comments exists
+            if (!p.comments) p.comments = [];
+        });
+
+        posts.splice(0, posts.length, ...apiPosts);
+    } catch (err) {
+        console.error("Error loading posts from API:", err);
+        // Fallback to localStorage if API fails (optional, removing staticPosts per request to use API)
+        const storedPosts = JSON.parse(localStorage.getItem('posts') || '[]');
+        posts.splice(0, posts.length, ...storedPosts);
+    }
 }
 
 loadPosts();
@@ -439,51 +512,7 @@ window.addEventListener('post-created', loadPosts);
 
 // per-post image index
 const imageIndex = reactive({})
-// touch start positions for swipe
-const touchStartX = {}
 
-function prevImage(post) {
-    const id = post.id
-    const imgs = post.images || []
-    if (!imgs.length) return
-    const idx = imageIndex[id] || 0
-    imageIndex[id] = (idx + imgs.length - 1) % imgs.length
-}
-
-function nextImage(post) {
-    const id = post.id
-    const imgs = post.images || []
-    if (!imgs.length) return
-    const idx = imageIndex[id] || 0
-    imageIndex[id] = (idx + 1) % imgs.length
-}
-
-function gotoImage(post, i) {
-    const id = post.id
-    const imgs = post.images || []
-    if (!imgs.length) return
-    imageIndex[id] = i % imgs.length
-}
-
-function onTouchStart(e, post) {
-    touchStartX[post.id] = e.touches ? e.touches[0].clientX : e.clientX
-}
-
-function onTouchEnd(e, post) {
-    const start = touchStartX[post.id]
-    const end = e.changedTouches ? e.changedTouches[0].clientX : e.clientX
-    if (start == null) return
-    const delta = end - start
-    const thresh = 40
-    if (delta > thresh) {
-        // swipe right -> previous
-        prevImage(post)
-    } else if (delta < -thresh) {
-        // swipe left -> next
-        nextImage(post)
-    }
-    touchStartX[post.id] = null
-}
 
 const suggestions = [
     { id: 1, user: "Kim Anh", avatar: '/img32.jpg' },
@@ -491,43 +520,54 @@ const suggestions = [
     { id: 3, user: "Ng An", avatar: '/img20.jpg' },
 ];
 
-function toggleLike(post) {
-    // Ensure likes is a number
+async function toggleLike(post) {
     if (typeof post.likes !== 'number') post.likes = 0;
-    
     const username = me.username;
     if (!post.likedBy) post.likedBy = [];
     
     const alreadyLiked = post.likedBy.includes(username);
     
     if (alreadyLiked) {
-        // Unlike
         post.likes--;
         post.likedBy = post.likedBy.filter(u => u !== username);
-        post.liked = false; // Update UI state for current user
+        post.liked = false;
     } else {
-        // Like
         post.likes++;
         post.likedBy.push(username);
-        post.liked = true; // Update UI state for current user
+        post.liked = true;
     }
     
-    // Update localStorage
-    const storedPosts = JSON.parse(localStorage.getItem('posts') || '[]');
-    const index = storedPosts.findIndex(p => p.id === post.id);
-    if (index !== -1) {
-        storedPosts[index] = { ...storedPosts[index], likes: post.likes, likedBy: post.likedBy };
-        localStorage.setItem('posts', JSON.stringify(storedPosts));
-        // Dispatch event to sync
-        window.dispatchEvent(new Event('post-created'));
+    try {
+        await api.patch(`/posts/${post.id}`, {
+            likes: post.likes,
+            likedBy: post.likedBy
+        });
+    } catch (err) {
+        console.error("Failed to toggle like", err);
+        // Revert
+        if (alreadyLiked) {
+            post.likes++;
+            post.likedBy.push(username);
+            post.liked = true;
+        } else {
+            post.likes--;
+            post.likedBy = post.likedBy.filter(u => u !== username);
+            post.liked = false;
+        }
+        alert("Lỗi kết nối server");
     }
 }
 
 const newCommentText = reactive({})
 const commentExpanded = reactive({})
 const commentMenuOpen = reactive({})
-const commentEditing = reactive({})
-const commentEditText = reactive({})
+// const commentEditing = reactive({})
+// const commentEditText = reactive({})
+const deleteModal = reactive({
+    show: false,
+    comment: null,
+    post: null
+})
 
 const showComposer = ref(false)
 const router = useRouter()
@@ -582,42 +622,43 @@ function reportPost(post) {
     closePostMenu(post.id)
 }
 
-function addComment(post) {
+async function addComment(post) {
     const t = (newCommentText[post.id] || '').trim()
     if (!t) return
     const nextId = (post.comments && post.comments.length ? Math.max(...post.comments.map(c => c.id)) + 1 : 1)
     const c = { id: nextId, user: me.username, content: t, createdAt: Date.now() }
-    post.comments = [...(post.comments || []), c]
+    
+    const previousComments = [...(post.comments || [])];
+    post.comments = [...previousComments, c]
     newCommentText[post.id] = ''
 
-    // Update localStorage
-    const storedPosts = JSON.parse(localStorage.getItem('posts') || '[]');
-    const index = storedPosts.findIndex(p => p.id === post.id);
-    if (index !== -1) {
-        storedPosts[index] = { ...storedPosts[index], comments: post.comments };
-        localStorage.setItem('posts', JSON.stringify(storedPosts));
-        // Dispatch event to sync
-        window.dispatchEvent(new Event('post-created'));
+    try {
+        await api.patch(`/posts/${post.id}`, { comments: post.comments });
+    } catch(err) {
+        console.error("Error adding comment", err);
+        post.comments = previousComments;
+         newCommentText[post.id] = t; 
+        alert("Lỗi thêm bình luận");
     }
 }
 
-function deleteComment(post, commentId) {
+async function deleteComment(post, commentId) {
     const list = post.comments || []
     const target = list.find(c => c.id === commentId)
     // Allow if user is comment author OR user is post owner
     const isOwner = post.user === me.username
     const isAuthor = target && target.user === me.username
     if (!target || (!isAuthor && !isOwner)) return
+    
+    const previousComments = [...list];
     post.comments = list.filter(c => c.id !== commentId)
 
-    // Update localStorage
-    const storedPosts = JSON.parse(localStorage.getItem('posts') || '[]');
-    const index = storedPosts.findIndex(p => p.id === post.id);
-    if (index !== -1) {
-        storedPosts[index] = { ...storedPosts[index], comments: post.comments };
-        localStorage.setItem('posts', JSON.stringify(storedPosts));
-        // Dispatch event to sync
-        window.dispatchEvent(new Event('post-created'));
+    try {
+        await api.patch(`/posts/${post.id}`, { comments: post.comments });
+    } catch(err) {
+        console.error("Error deleting comment", err);
+        post.comments = previousComments;
+        alert("Lỗi xoá bình luận");
     }
 }
 
@@ -630,76 +671,112 @@ function displayedComments(post) {
     return list.slice(Math.max(0, list.length - n))
 }
 
-function isCommentMenuOpen(post, commentId) {
-    const map = commentMenuOpen[post.id] || {}
-    return !!map[commentId]
-}
+// function isCommentMenuOpen(post, commentId) {
+//     const map = commentMenuOpen[post.id] || {}
+//     return !!map[commentId]
+// }
 
-function toggleCommentMenu(post, commentId) {
-    const map = commentMenuOpen[post.id] || {}
-    const next = { ...map, [commentId]: !map[commentId] }
-    commentMenuOpen[post.id] = next
-}
+// function toggleCommentMenu(post, commentId) {
+//     const map = commentMenuOpen[post.id] || {}
+//     const next = { ...map, [commentId]: !map[commentId] }
+//     commentMenuOpen[post.id] = next
+// }
 
-function startEditComment(post, commentId) {
-    const list = post.comments || []
-    const target = list.find(c => c.id === commentId)
-    if (!target || target.user !== me.username) return
-    const editMap = commentEditing[post.id] || {}
-    commentEditing[post.id] = { ...editMap, [commentId]: true }
-    const textMap = commentEditText[post.id] || {}
-    commentEditText[post.id] = { ...textMap, [commentId]: target.content }
-    toggleCommentMenu(post, commentId)
-}
+// function startEditComment(post, commentId) {
+//     const list = post.comments || []
+//     const target = list.find(c => c.id === commentId)
+//     if (!target || target.user !== me.username) return
+//     const editMap = commentEditing[post.id] || {}
+//     commentEditing[post.id] = { ...editMap, [commentId]: true }
+//     const textMap = commentEditText[post.id] || {}
+//     commentEditText[post.id] = { ...textMap, [commentId]: target.content }
+//     toggleCommentMenu(post, commentId)
+// }
 
-function isEditingComment(post, commentId) {
-    const map = commentEditing[post.id] || {}
-    return !!map[commentId]
-}
+// function isEditingComment(post, commentId) {
+//     const map = commentEditing[post.id] || {}
+//     return !!map[commentId]
+// }
 
-function getCommentEditText(post, commentId) {
-    const map = commentEditText[post.id] || {}
-    return map[commentId] || ''
-}
+// function getCommentEditText(post, commentId) {
+//     const map = commentEditText[post.id] || {}
+//     return map[commentId] || ''
+// }
 
-function setCommentEditText(post, commentId, val) {
-    const map = commentEditText[post.id] || {}
-    commentEditText[post.id] = { ...map, [commentId]: val }
-}
+// function setCommentEditText(post, commentId, val) {
+//     const map = commentEditText[post.id] || {}
+//     commentEditText[post.id] = { ...map, [commentId]: val }
+// }
 
-function saveEditComment(post, commentId) {
-    const list = post.comments || []
-    const target = list.find(c => c.id === commentId)
-    if (!target || target.user !== me.username) return
-    const text = getCommentEditText(post, commentId).trim()
-    if (!text) return
-    const ok = window.confirm('Lưu chỉnh sửa bình luận?')
-    if (!ok) return
-    target.content = text
-    const editMap = commentEditing[post.id] || {}
-    commentEditing[post.id] = { ...editMap, [commentId]: false }
+// async function saveEditComment(post, commentId) {
+//     const list = post.comments || []
+//     const target = list.find(c => c.id === commentId)
+//     if (!target || target.user !== me.username) return
+//     const text = getCommentEditText(post, commentId).trim()
+//     if (!text) return
+//     const ok = window.confirm('Lưu chỉnh sửa bình luận?')
+//     if (!ok) return
+//     
+//     const previousContent = target.content;
+//     target.content = text
+//     const editMap = commentEditing[post.id] || {}
+//     commentEditing[post.id] = { ...editMap, [commentId]: false }
+//
+//     try {
+//         await api.patch(`/posts/${post.id}`, { comments: post.comments });
+//     } catch(err) {
+//         console.error("Error saving comment", err);
+//         target.content = previousContent;
+//         commentEditing[post.id] = { ...editMap, [commentId]: true };
+//         alert("Lỗi lưu bình luận");
+//     }
+// }
 
-    // Update localStorage
-    const storedPosts = JSON.parse(localStorage.getItem('posts') || '[]');
-    const index = storedPosts.findIndex(p => p.id === post.id);
-    if (index !== -1) {
-        storedPosts[index] = { ...storedPosts[index], comments: post.comments };
-        localStorage.setItem('posts', JSON.stringify(storedPosts));
-        // Dispatch event to sync
-        window.dispatchEvent(new Event('post-created'));
+function onScroll(e, postId) {
+    const el = e.target;
+    // Calculate index based on scroll position
+    const index = Math.round(el.scrollLeft / el.clientWidth);
+    if (imageIndex[postId] !== index) {
+        imageIndex[postId] = index;
     }
 }
 
-function cancelEditComment(post, commentId) {
-    const editMap = commentEditing[post.id] || {}
-    commentEditing[post.id] = { ...editMap, [commentId]: false }
+function scrollCarousel(postId, direction) {
+    const container = document.getElementById(`carousel-${postId}`);
+    if (container) {
+        const scrollAmount = container.clientWidth * direction;
+        container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
 }
 
-function confirmDeleteComment(post, commentId) {
-    const ok = window.confirm('Bạn có chắc muốn xóa bình luận này?')
-    if (!ok) return
-    deleteComment(post, commentId)
+function showDeleteModal(post, comment) {
+    deleteModal.show = true
+    deleteModal.comment = comment
+    deleteModal.post = post
+    // Close menu
+    const map = commentMenuOpen[post.id] || {}
+    commentMenuOpen[post.id] = { ...map, [comment.id]: false }
 }
+
+function closeDeleteModal() {
+    deleteModal.show = false
+    deleteModal.comment = null
+    deleteModal.post = null
+}
+
+function executeDeleteComment() {
+    if (!deleteModal.post || !deleteModal.comment) {
+        closeDeleteModal()
+        return
+    }
+    
+    const post = deleteModal.post
+    const commentId = deleteModal.comment.id
+    
+    deleteComment(post, commentId)
+    closeDeleteModal()
+}
+
 
 function timeAgo(ts) {
     const delta = Date.now() - ts
@@ -786,63 +863,66 @@ body {
     object-fit: cover;
     position: relative;
     overflow: hidden;
-    width: fit-content;
+    width: 100%;
 }
 
-/* overlayed carousel controls inside the image */
-.post-image .carousel-prev,
-.post-image .carousel-next {
+/* overlaid carousel controls inside the image */
+.post-image .carousel-btn {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    background: rgba(0, 0, 0, 0.45);
-    color: #fff;
+    background: rgba(255, 255, 255, 0.85); /* Light background for IG style */
+    color: #000;
     border: none;
-    width: 40px;
-    height: 40px;
-    font-size: 20px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    font-size: 16px;
     display: flex;
     align-items: center;
     justify-content: center;
-    text-align: center;
     cursor: pointer;
-    border-radius: 999px;
     z-index: 6;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transition: all 0.2s ease;
+    padding: 0;
 }
 
-.post-image .carousel-prev {
-    left: 12px
+.post-image .carousel-btn.prev {
+    left: 10px;
 }
 
-.post-image .carousel-next {
-    right: 12px
+.post-image .carousel-btn.next {
+    right: 10px;
 }
 
-.post-image .carousel-prev:hover,
-.post-image .carousel-next:hover {
-    background: rgba(0, 0, 0, 0.65)
+.post-image .carousel-btn:hover {
+    background: #fff;
+    transform: translateY(-50%) scale(1.1);
 }
 
-.post-image .image-dots {
+.post-image .image-dots-overlay {
     position: absolute;
-    bottom: 8px;
+    bottom: 15px;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
-    gap: 6px;
+    gap: 4px;
     z-index: 6;
 }
 
 .post-image .dot {
-    width: 8px;
-    height: 8px;
-    background: rgba(255, 255, 255, 0.5);
+    width: 6px;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.4);
     border-radius: 50%;
-    cursor: pointer
+    cursor: pointer;
+    transition: background 0.2s;
 }
 
 .post-image .dot.active {
-    background: #fff
+    background: #fff;
+    transform: scale(1.2);
 }
 
 /* Small visual tweaks */
@@ -887,5 +967,79 @@ body {
 
 .nav-item .nav-link:hover {
     background: rgba(0, 0, 0, 0.04)
+}
+
+/* ================== DELETE MODAL STYLES ================== */
+.modal {
+  transition: opacity 0.15s linear;
+}
+
+.modal.fade {
+  opacity: 0;
+}
+
+.modal.show {
+  opacity: 1;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.modal-dialog {
+  animation: slideDown 0.3s ease-out;
+}
+
+.modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-backdrop.show {
+  animation: fadeIn 0.15s ease-in-out;
+}
+
+.modal-content {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.modal-header {
+  background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+}
+
+.modal-footer {
+  background: #f8f9fa;
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.btn-danger:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+}
+
+.btn-light:hover {
+  background: #e9ecef;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 </style>

@@ -1,240 +1,787 @@
 <template>
-  <header class="">
-    <nav class="navbar navbar-light bg-white border-bottom py-2 fixed-top">
-      <div class="container-fluid d-flex justify-content-between align-items-center position-relative">
-        <div class="d-flex align-items-center gap-3">
-          <a class="navbar-brand mb-0 h1 fw-bold" href="#">MyBlog</a>
-          <form class="d-none d-sm-block">
-            <input class="form-control form-control-sm rounded-pill" style="width:240px" placeholder="Tìm kiếm" />
-          </form>
-          <div class="inline-icon-menu d-none d-md-flex align-items-center ms-2 ">
-            <router-link :to="{ name: 'Home' }" class="icon-btn" title="Trang chủ">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
-                <path d="M304 70.1C313.1 61.9 326.9 61.9 336 70.1L568 278.1C577.9 286.9 578.7 302.1 569.8 312C560.9 321.9 545.8 322.7 535.9 313.8L527.9 306.6L527.9 511.9C527.9 547.2 499.2 575.9 463.9 575.9L175.9 575.9C140.6 575.9 111.9 547.2 111.9 511.9L111.9 306.6L103.9 313.8C94 322.6 78.9 321.8 70 312C61.1 302.2 62 287 71.8 278.1L304 70.1zM320 120.2L160 263.7L160 512C160 520.8 167.2 528 176 528L224 528L224 424C224 384.2 256.2 352 296 352L344 352C383.8 352 416 384.2 416 424L416 528L464 528C472.8 528 480 520.8 480 512L480 263.7L320 120.3zM272 528L368 528L368 424C368 410.7 357.3 400 344 400L296 400C282.7 400 272 410.7 272 424L272 528z" />
-              </svg>
-            </router-link>
-            <router-link :to="{ name: 'Profile' }" class="icon-btn" title="Trang cá nhân">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" class="me-2 menu-icon">
-                <path d="M240 192C240 147.8 275.8 112 320 112C364.2 112 400 147.8 400 192C400 236.2 364.2 272 320 272C275.8 272 240 236.2 240 192zM448 192C448 121.3 390.7 64 320 64C249.3 64 192 121.3 192 192C192 262.7 249.3 320 320 320C390.7 320 448 262.7 448 192zM144 544C144 473.3 201.3 416 272 416L368 416C438.7 416 496 473.3 496 544L496 552C496 565.3 506.7 576 520 576C533.3 576 544 565.3 544 552L544 544C544 446.8 465.2 368 368 368L272 368C174.8 368 96 446.8 96 544L96 552C96 565.3 106.7 576 120 576C133.3 576 144 565.3 144 552L144 544z" />
-              </svg>
-            </router-link>
-            <a href="#" class="icon-btn" title="Khám phá">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
-                <path d="M320 112C434.9 112 528 205.1 528 320C528 434.9 434.9 528 320 528C205.1 528 112 434.9 112 320C112 205.1 205.1 112 320 112zM320 576C461.4 576 576 461.4 576 320C576 178.6 461.4 64 320 64C178.6 64 64 178.6 64 320C64 461.4 178.6 576 320 576zM276.5 211.5C269.1 207 259.8 206.8 252.2 211C244.6 215.2 240 223.3 240 232L240 408C240 416.7 244.7 424.7 252.3 428.9C259.9 433.1 269.1 433 276.6 428.4L420.6 340.4C427.7 336 432.1 328.3 432.1 319.9C432.1 311.5 427.7 303.8 420.6 299.4L276.6 211.4zM362 320L288 365.2L288 274.8L362 320z" />
-              </svg>
-            </a>
-            <a href="#" class="icon-btn" title="Tin nhắn">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
-                <path d="M125.4 128C91.5 128 64 155.5 64 189.4C64 190.3 64 191.1 64.1 192L64 192L64 448C64 483.3 92.7 512 128 512L512 512C547.3 512 576 483.3 576 448L576 192L575.9 192C575.9 191.1 576 190.3 576 189.4C576 155.5 548.5 128 514.6 128L125.4 128zM528 256.3L528 448C528 456.8 520.8 464 512 464L128 464C119.2 464 112 456.8 112 448L112 256.3L266.8 373.7C298.2 397.6 341.7 397.6 373.2 373.7L528 256.3zM112 189.4C112 182 118 176 125.4 176L514.6 176C522 176 528 182 528 189.4C528 193.6 526 197.6 522.7 200.1L344.2 335.5C329.9 346.3 310.1 346.3 295.8 335.5L117.3 200.1C114 197.6 112 193.6 112 189.4z" />
-              </svg>
-            </a>
-          </div>
-        </div>
-        <div class="d-flex  gap-3">
-          <div class="rounded-circle overflow-hidden " style="width:32px;height:32px;">
-            <img src="/img01.jpg" class="w-100 h-100 object-fit-cover" alt="avatar" />
-          </div>
-        </div>
-      </div>
-    </nav>
-  </header>
-  <br><br>
   <div class="container py-4" style="padding-top: 70px;">
     <div class="row justify-content-center">
       <div class="col-xl-10">
-        <div class="card shadow-sm">
+        <div class="card shadow-sm overflow-hidden" v-if="post">
           <div class="row g-0">
-            <div class="col-lg-7 position-relative">
-              <div class="post-image-wrapper">
-                <img :src="currentImage" class="w-100 h-100 object-fit-cover" alt="post" />
+
+            <!-- ================== HÌNH ẢNH ================== -->
+            <div class="col-lg-7 bg-black d-flex align-items-center justify-content-center position-relative post-left-col">
+              
+              <div v-if="hasImages" class="w-100 h-100 d-flex align-items-center justify-content-center position-relative">
+                <img :src="currentImage" class="img-fluid" style="max-height: 100%; object-fit: contain;" alt="post" />
+
+                <!-- Nút chuyển ảnh -->
                 <button v-if="post.images && post.images.length > 1" class="carousel-prev" @click="prevImage">‹</button>
                 <button v-if="post.images && post.images.length > 1" class="carousel-next" @click="nextImage">›</button>
+
+                <!-- Dấu chấm chuyển ảnh -->
                 <div v-if="post.images && post.images.length > 1" class="image-dots">
-                  <span v-for="(img, i) in post.images" :key="i" :class="['dot', { active: i === imageIndex }]" @click="gotoImage(i)"></span>
+                  <span v-for="(img, i) in post.images" :key="i"
+                        :class="['dot', { active: i === imageIndex }]"
+                        @click="gotoImage(i)"></span>
                 </div>
               </div>
+              <div v-else class="text-white">Không có hình ảnh</div>
+
             </div>
 
-            <div class="col-lg-5">
-              <div class="p-3 h-100 d-flex flex-column">
-                <div class="d-flex align-items-center mb-3">
-                  <img :src="post.userAvatar" class="rounded-circle me-2" width="40" height="40" />
-                  <div class="flex-grow-1">
-                    <div class="fw-bold">{{ post.user }}</div>
-                    <small class="text-muted" v-if="post.location">{{ post.location }}</small>
-                    <div class="text-muted small">{{ post.createdAt ? timeAgo(post.createdAt) : post.time }}</div>
+            <!-- ================== NỘI DUNG ================== -->
+            <div class="col-lg-5 d-flex flex-column bg-white post-right-col">
+              
+              <!-- Header -->
+              <div class="p-3 border-bottom d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center">
+                  <div class="position-relative me-3">
+                    <img :src="post.userAvatar || '/img01.jpg'" class="rounded-circle border" width="32" height="32" style="object-fit:cover;" />
                   </div>
-                  <div class="position-relative ms-auto">
-                    <button class="btn btn-link p-0" @click="menuOpen = !menuOpen">•••</button>
-                    <div v-if="menuOpen" class="card position-absolute" style="top: 28px; right: 0; z-index: 60; min-width: 180px;">
-                      <div class="list-group list-group-flush">
-                        <button class="list-group-item list-group-item-action" @click="copyPostLink(post)">Sao chép liên kết</button>
-                        <button class="list-group-item list-group-item-action" @click="goBack">Trở về bài viết</button>
-                        <button class="list-group-item list-group-item-action text-danger" @click="reportPost(post)">Báo cáo</button>
-                        <button class="list-group-item list-group-item-action" @click="closeMenu">Hủy</button>
+                  <div class="fw-bold text-dark text-decoration-none small">{{ post.user }}</div>
+                  <span class="mx-1">•</span>
+                  <button class="btn btn-link p-0 text-primary small text-decoration-none fw-bold">Theo dõi</button>
+                </div>
+                
+                <!-- Menu -->
+                <div class="position-relative">
+                  <button class="btn btn-link text-dark p-0" @click="showMenu = !showMenu">
+                    <svg aria-label="Tùy chọn khác" class="x1lliihq x1n2onr6 x5n08af" fill="currentColor" height="24" role="img" viewBox="0 0 24 24" width="24">
+                      <circle cx="12" cy="12" r="1.5"></circle>
+                      <circle cx="6" cy="12" r="1.5"></circle>
+                      <circle cx="18" cy="12" r="1.5"></circle>
+                    </svg>
+                  </button>
+                  <div v-if="showMenu" class="card position-absolute shadow-sm p-0 overflow-hidden" 
+                       style="top: 100%; right: 0; z-index: 1000; min-width: 180px;">
+                    <div class="list-group list-group-flush text-start">
+                      <button class="list-group-item list-group-item-action text-danger fw-bold" @click="reportPost">Báo cáo</button>
+                      <button class="list-group-item list-group-item-action text-danger fw-bold">Bỏ theo dõi</button>
+                      <button class="list-group-item list-group-item-action" @click="goBack">Đi tới bài viết</button>
+                      <button class="list-group-item list-group-item-action" @click="copyLink">Sao chép liên kết</button>
+                      <button class="list-group-item list-group-item-action" @click="showMenu = false">Hủy</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Comment list (Scrollable) -->
+              <div class="flex-grow-1 overflow-auto p-3 custom-scrollbar" style="background: #fff;">
+                
+                <!-- Caption as first item -->
+                <div class="d-flex mb-4">
+                  <div class="flex-shrink-0 me-3">
+                     <img :src="post.userAvatar || '/img01.jpg'" class="rounded-circle border" width="32" height="32" style="object-fit: cover;" />
+                  </div>
+                  <div>
+                    <span class="fw-bold me-1 small">{{ post.user }}</span>
+                    <span class="small">{{ post.caption }}</span>
+                    <div class="text-muted small mt-2" style="font-size: 12px;">{{ post.createdAt ? timeAgo(post.createdAt) : post.time }}</div>
+                  </div>
+                </div>
+
+                <!-- Comments -->
+                <div v-for="c in post.comments" :key="c.id" class="mb-3">
+                  <div class="d-flex w-100 group-hover-visible">
+                    <!-- Avatar -->
+                    <div class="flex-shrink-0 me-3">
+                      <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center text-white border overflow-hidden" 
+                           style="width: 32px; height: 32px; font-size: 12px;">
+                           <img v-if="c.user === me.username" :src="me.avatar" class="w-100 h-100 object-fit-cover" />
+                           <span v-else>{{ c.user.charAt(0).toUpperCase() }}</span>
                       </div>
+                    </div>
+                    
+                    <!-- Comment content -->
+                    <div class="flex-grow-1">
+                      <!-- Editing mode -->
+                      <div v-if="editingCommentId === c.id" class="mb-2">
+                        <input v-model="editCommentText" type="text" class="form-control form-control-sm mb-1" 
+                               placeholder="Chỉnh sửa bình luận..." />
+                        <div class="d-flex gap-2">
+                          <button class="btn btn-sm btn-primary" @click="saveEditComment(c)">Lưu</button>
+                          <button class="btn btn-sm btn-outline-secondary" @click="cancelEditComment">Hủy</button>
+                        </div>
+                      </div>
+                      
+                      <!-- Normal mode -->
+                      <div v-else class="position-relative">
+                        <!-- Comment Text -->
+                        <div class="d-inline">
+                          <span class="fw-bold me-1 small">{{ c.user }}</span>
+                          <span class="small">{{ c.content }}</span>
+                        </div>
+                        
+                        <!-- Comment Metadata & Actions -->
+                        <div class="d-flex align-items-center gap-3 mt-1">
+                          <small class="text-muted" style="font-size: 12px;">{{ timeAgo(c.createdAt) }}</small>
+                          <small v-if="c.likes > 0" class="text-muted fw-bold" style="font-size: 12px;">{{ c.likes }} lượt thích</small>
+                          <button class="btn btn-link p-0 text-muted fw-bold" style="font-size: 12px; text-decoration: none;"
+                                  @click="startReplyComment(c)">Trả lời</button>
+                          
+                          <!-- Ellipsis for actions (only visible on hover traditionally, but here permanent for UX) -->
+                          <button class="btn btn-link p-0 text-muted" 
+                                  style="font-size: 12px; text-decoration: none;"
+                                  @click="toggleCommentMenu(c.id)">•••</button>
+                        </div>
+
+                        <!-- Comment menu -->
+                        <div v-if="commentMenuOpen === c.id" 
+                             class="card position-absolute shadow-sm p-0 overflow-hidden" 
+                             style="top: 100%; left: 0; z-index: 1000; min-width: 140px;">
+                          <div class="list-group list-group-flush text-start">
+                            <button v-if="c.user === me.username" 
+                                    class="list-group-item list-group-item-action small" 
+                                    @click="startEditComment(c)">Chỉnh sửa</button>
+                            <button v-if="c.user === me.username || post.user === me.username" class="list-group-item list-group-item-action text-danger small" 
+                                    @click="showDeleteModal(c)">Xóa</button>
+                            <button v-if="c.user !== me.username" 
+                                    class="list-group-item list-group-item-action text-danger small" 
+                                    @click="reportComment(c)">Báo cáo</button>
+                            <button class="list-group-item list-group-item-action small" 
+                                    @click="commentMenuOpen = null">Hủy</button>
+                          </div>
+                        </div>
+                        
+                        <!-- Replies -->
+                        <div v-if="c.replies && c.replies.length > 0" class="mt-2 ps-3 border-start">
+                          <div v-for="r in c.replies" :key="r.id" class="d-flex mb-2">
+                            <div class="rounded-circle me-2 bg-secondary d-flex align-items-center justify-content-center text-white border overflow-hidden flex-shrink-0" 
+                                 style="width: 24px; height: 24px; font-size: 10px;">
+                                 <img v-if="r.user === me.username" :src="me.avatar" class="w-100 h-100 object-fit-cover" />
+                                 <span v-else>{{ r.user.charAt(0).toUpperCase() }}</span>
+                            </div>
+                            <div>
+                                <span class="fw-bold me-1 small">{{ r.user }}</span>
+                                <span class="small">{{ r.content }}</span>
+                                <div class="text-muted mt-1" style="font-size: 11px;">{{ timeAgo(r.createdAt) }}</div>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <!-- Reply input -->
+                        <div v-if="replyingToCommentId === c.id" class="mt-2">
+                          <div class="d-flex align-items-center gap-2">
+                            <input v-model="replyCommentText" 
+                                   type="text" 
+                                   class="form-control form-control-sm" 
+                                   placeholder="Viết trả lời..." 
+                                   @keyup.enter="submitReply(c)" />
+                            <button class="btn btn-sm btn-link text-primary fw-bold text-decoration-none" 
+                                    :disabled="!replyCommentText.trim()" 
+                                    @click="submitReply(c)">Đăng</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <!-- Heart Icon for Comment -->
+                    <div class="ms-2">
+                        <button class="btn btn-link p-0 text-muted" @click="toggleCommentLike(c)">
+                            <svg v-if="!isCommentLiked(c)" aria-label="Thích" class="x1lliihq x1n2onr6 x1roi4f4" fill="currentColor" height="12" role="img" viewBox="0 0 24 24" width="12">
+                                <path d="M16.792 3.904A4.989 4.989 0 0 1 21.5 9.122c0 3.072-2.652 4.959-5.197 7.222-2.512 2.243-3.865 3.469-4.303 3.752-.477-.309-2.143-1.823-4.303-3.752C5.141 14.072 2.5 12.167 2.5 9.122a4.989 4.989 0 0 1 4.708-5.218 4.21 4.21 0 0 1 3.675 1.941c.84 1.175.98 1.763 1.12 1.763s.278-.588 1.11-1.766a4.17 4.17 0 0 1 3.679-1.938m0-2a6.04 6.04 0 0 0-4.797 2.127 6.052 6.052 0 0 0-4.787-2.127A6.985 6.985 0 0 0 .5 9.122c0 3.61 2.55 5.827 5.015 7.97.283.246.569.494.853.747l1.027.918a44.998 44.998 0 0 0 3.518 3.018 2 2 0 0 0 2.174 0 45.263 45.263 0 0 0 3.626-3.115l.922-.824c.293-.26.59-.519.885-.774 2.334-2.025 4.98-4.32 4.98-7.94a6.985 6.985 0 0 0-6.708-7.218Z"></path>
+                            </svg>
+                            <svg v-else aria-label="Bỏ thích" class="x1lliihq x1n2onr6 x1roi4f4" fill="#ff3040" height="12" role="img" viewBox="0 0 24 24" width="12">
+                                <path d="M16.792 3.904A4.989 4.989 0 0 1 21.5 9.122c0 3.072-2.652 4.959-5.197 7.222-2.512 2.243-3.865 3.469-4.303 3.752-.477-.309-2.143-1.823-4.303-3.752C5.141 14.072 2.5 12.167 2.5 9.122a4.989 4.989 0 0 1 4.708-5.218 4.21 4.21 0 0 1 3.675 1.941c.84 1.175.98 1.763 1.12 1.763s.278-.588 1.11-1.766a4.17 4.17 0 0 1 3.679-1.938m0-2a6.04 6.04 0 0 0-4.797 2.127 6.052 6.052 0 0 0-4.787-2.127A6.985 6.985 0 0 0 .5 9.122c0 3.61 2.55 5.827 5.015 7.97.283.246.569.494.853.747l1.027.918a44.998 44.998 0 0 0 3.518 3.018 2 2 0 0 0 2.174 0 45.263 45.263 0 0 0 3.626-3.115l.922-.824c.293-.26.59-.519.885-.774 2.334-2.025 4.98-4.32 4.98-7.94a6.985 6.985 0 0 0-6.708-7.218Z"></path>
+                            </svg>
+                        </button>
                     </div>
                   </div>
                 </div>
 
-                <div class="mb-2">
-                  <strong>{{ post.likes }} lượt thích</strong>
-                </div>
+              </div>
 
-                <div class="mb-3">
-                  <strong>{{ post.user }}</strong>
-                  <span class="ms-1">{{ post.caption }}</span>
-                </div>
+              <!-- Footer Actions -->
+              <div class="p-3 border-top bg-white">
+                <div class="d-flex align-items-center mb-2">
+                  <div class="d-flex gap-3">
+                      <button class="btn btn-link p-0 text-dark" @click="toggleLike">
+                        <svg v-if="!post.liked" aria-label="Thích" class="x1lliihq x1n2onr6 x5n08af" fill="currentColor" height="24" role="img" viewBox="0 0 24 24" width="24">
+                          <path d="M16.792 3.904A4.989 4.989 0 0 1 21.5 9.122c0 3.072-2.652 4.959-5.197 7.222-2.512 2.243-3.865 3.469-4.303 3.752-.477-.309-2.143-1.823-4.303-3.752C5.141 14.072 2.5 12.167 2.5 9.122a4.989 4.989 0 0 1 4.708-5.218 4.21 4.21 0 0 1 3.675 1.941c.84 1.175.98 1.763 1.12 1.763s.278-.588 1.11-1.766a4.17 4.17 0 0 1 3.679-1.938m0-2a6.04 6.04 0 0 0-4.797 2.127 6.052 6.052 0 0 0-4.787-2.127A6.985 6.985 0 0 0 .5 9.122c0 3.61 2.55 5.827 5.015 7.97.283.246.569.494.853.747l1.027.918a44.998 44.998 0 0 0 3.518 3.018 2 2 0 0 0 2.174 0 45.263 45.263 0 0 0 3.626-3.115l.922-.824c.293-.26.59-.519.885-.774 2.334-2.025 4.98-4.32 4.98-7.94a6.985 6.985 0 0 0-6.708-7.218Z"></path>
+                        </svg>
+                        <svg v-else aria-label="Bỏ thích" class="x1lliihq x1n2onr6 x5n08af" fill="#ff3040" height="24" role="img" viewBox="0 0 24 24" width="24">
+                          <path d="M16.792 3.904A4.989 4.989 0 0 1 21.5 9.122c0 3.072-2.652 4.959-5.197 7.222-2.512 2.243-3.865 3.469-4.303 3.752-.477-.309-2.143-1.823-4.303-3.752C5.141 14.072 2.5 12.167 2.5 9.122a4.989 4.989 0 0 1 4.708-5.218 4.21 4.21 0 0 1 3.675 1.941c.84 1.175.98 1.763 1.12 1.763s.278-.588 1.11-1.766a4.17 4.17 0 0 1 3.679-1.938m0-2a6.04 6.04 0 0 0-4.797 2.127 6.052 6.052 0 0 0-4.787-2.127A6.985 6.985 0 0 0 .5 9.122c0 3.61 2.55 5.827 5.015 7.97.283.246.569.494.853.747l1.027.918a44.998 44.998 0 0 0 3.518 3.018 2 2 0 0 0 2.174 0 45.263 45.263 0 0 0 3.626-3.115l.922-.824c.293-.26.59-.519.885-.774 2.334-2.025 4.98-4.32 4.98-7.94a6.985 6.985 0 0 0-6.708-7.218Z"></path>
+                        </svg>
+                      </button>
 
-                <div class="flex-grow-1 overflow-auto border rounded p-2" style="max-height: 360px;">
-                  <div v-for="c in (post.comments || [])" :key="c.id" class="mb-2">
-                    <strong>{{ c.user }}</strong>
-                    <span class="ms-1">{{ c.content }}</span>
-                    <div class="text-muted small">{{ timeAgo(c.createdAt) }}</div>
+                      <button class="btn btn-link p-0 text-dark">
+                        <svg aria-label="Bình luận" class="x1lliihq x1n2onr6 x5n08af" fill="currentColor" height="24" role="img" viewBox="0 0 24 24" width="24">
+                          <path d="M20.656 17.008a9.993 9.993 0 1 0-3.59 3.615L22 22Z" fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="2"></path>
+                        </svg>
+                      </button>
+
+                      <button class="btn btn-link p-0 text-dark">
+                         <svg aria-label="Chia sẻ bài viết" class="x1lliihq x1n2onr6 x5n08af" fill="currentColor" height="24" role="img" viewBox="0 0 24 24" width="24">
+                            <line fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="2" x1="22" x2="9.218" y1="2" y2="10.083"></line>
+                            <polygon fill="none" points="11.698 20.334 22 3.001 2 3.001 9.218 10.084 11.698 20.334" stroke="currentColor" stroke-linejoin="round" stroke-width="2"></polygon>
+                        </svg>
+                      </button>
+                  </div>
+                  <div class="ms-auto">
+                      <button class="btn btn-link p-0 text-dark">
+                        <svg aria-label="Lưu" class="x1lliihq x1n2onr6 x5n08af" fill="currentColor" height="24" role="img" viewBox="0 0 24 24" width="24">
+                            <polygon fill="none" points="20 21 12 13.44 4 21 4 3 20 3 20 21" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></polygon>
+                        </svg>
+                      </button>
                   </div>
                 </div>
+                
+                <div class="fw-bold mb-1 small">{{ post.likes }} lượt thích</div>
+                <div class="text-muted small text-uppercase mb-3" style="font-size: 10px;">{{ post.createdAt ? timeAgo(post.createdAt) : 'Vừa xong' }}</div>
 
-                <div class="mt-3 d-flex">
-                  <input v-model="newComment" class="form-control me-2" placeholder="Bình luận..." />
-                  <button class="btn btn-primary" @click="addComment" :disabled="!newComment.trim()">Đăng</button>
+                <!-- Add comment input -->
+                <div class="d-flex align-items-center border-top pt-3">
+                   <div class="me-2">
+                       <svg aria-label="Biểu tượng cảm xúc" class="x1lliihq x1n2onr6 x5n08af" fill="currentColor" height="24" role="img" viewBox="0 0 24 24" width="24">
+                           <path d="M15.83 10.997a1.167 1.167 0 1 0 1.167 1.167 1.167 1.167 0 0 0-1.167-1.167Zm-6.5 1.167a1.167 1.167 0 1 0-1.166 1.167 1.167 1.167 0 0 0 1.166-1.167Zm5.163 3.24a3.406 3.406 0 0 1-4.982.007 1 1 0 1 0-1.557 1.256 5.397 5.397 0 0 0 8.09 0 1 1 0 0 0-1.55-1.263ZM12 .503a11.5 11.5 0 1 0 11.5 11.5A11.513 11.513 0 0 0 12 .503Zm0 21a9.5 9.5 0 1 1 9.5-9.5 9.51 9.51 0 0 1-9.5 9.5Z"></path>
+                       </svg>
+                   </div>
+                   <div class="flex-grow-1 position-relative">
+                      <input v-model="newComment" class="form-control border-0 px-0 shadow-none bg-transparent" placeholder="Thêm bình luận..." 
+                             style="font-size: 14px;" @keyup.enter="doAddComment" />
+                   </div>
+                   <button class="btn btn-link text-primary fw-bold text-decoration-none small" 
+                           :disabled="!newComment.trim()" @click="doAddComment">Đăng</button>
                 </div>
               </div>
+
             </div>
+
           </div>
+        </div>
+        <div v-else class="text-center py-5">
+            <p>Không tìm thấy bài viết.</p>
+            <router-link :to="{name: 'Home'}" class="btn btn-primary">Quay lại trang chủ</router-link>
         </div>
       </div>
     </div>
   </div>
+  
+  <!-- ================== DELETE COMMENT MODAL ================== -->
+  <div class="modal fade" :class="{ show: deleteModal.show }" :style="{ display: deleteModal.show ? 'block' : 'none' }" 
+       tabindex="-1" @click.self="closeDeleteModal">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg">
+        <div class="modal-header border-0 pb-0">
+          <h5 class="modal-title fw-bold">
+            <i class="bi bi-exclamation-triangle-fill text-danger me-2"></i>
+            Xóa bình luận
+          </h5>
+          <button type="button" class="btn-close" @click="closeDeleteModal"></button>
+        </div>
+        <div class="modal-body pt-2">
+          <p class="mb-2">Bạn có chắc chắn muốn xóa bình luận này không?</p>
+          <div v-if="deleteModal.comment" class="bg-light rounded p-3 mb-3">
+            <div class="d-flex align-items-start">
+              <div class="rounded-circle me-2 bg-secondary d-flex align-items-center justify-content-center text-white" 
+                   style="width: 32px; height: 32px; min-width: 32px; font-size: 12px;">
+                <span>{{ deleteModal.comment.user.charAt(0).toUpperCase() }}</span>
+              </div>
+              <div>
+                <div class="fw-bold small">{{ deleteModal.comment.user }}</div>
+                <div class="text-muted small" style="word-break: break-word;">{{ deleteModal.comment.content }}</div>
+              </div>
+            </div>
+          </div>
+          <p class="text-muted small mb-0">
+            <i class="bi bi-info-circle me-1"></i>
+            Hành động này không thể hoàn tác.
+          </p>
+        </div>
+        <div class="modal-footer border-0 pt-0">
+          <button type="button" class="btn btn-light" @click="closeDeleteModal">
+            <i class="bi bi-x-circle me-1"></i>Hủy
+          </button>
+          <button type="button" class="btn btn-danger" @click="executeDeleteComment">
+            <i class="bi bi-trash me-1"></i>Xóa bình luận
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Modal backdrop -->
+  <div v-if="deleteModal.show" class="modal-backdrop fade show"></div>
 </template>
 
 <script setup>
-import { onMounted, reactive, ref, computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { ref, reactive, onMounted, computed } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import api from "../services/api";
 
-const route = useRoute()
-const router = useRouter()
-const imageIndex = ref(0)
-const newComment = ref('')
-const menuOpen = ref(false)
+const route = useRoute();
+const router = useRouter();
 
-const post = reactive({
-  id: null,
-  user: 'Người dùng',
-  userAvatar: '/img01.jpg',
-  time: 'vừa xong',
-  caption: '',
-  likes: 0,
-  image: '/img21.jpg',
-  images: null,
-  comments: []
-})
+const imageIndex = ref(0);
+const newComment = ref("");
+const post = ref(null);
+const showMenu = ref(false);
 
-onMounted(() => {
-  const id = route.params.id
-  try {
-    const stored = sessionStorage.getItem('selectedPost')
-    if (stored) {
-      const data = JSON.parse(stored)
-      if (String(data.id) === String(id)) {
-        Object.assign(post, data)
-        if (typeof data.currentImageIndex === 'number') {
-          imageIndex.value = data.currentImageIndex
-        }
-      }
+// Comment management
+const commentMenuOpen = ref(null);
+const editingCommentId = ref(null);
+const editCommentText = ref("");
+const replyingToCommentId = ref(null);
+const replyCommentText = ref("");
+const deleteModal = reactive({
+    show: false,
+    comment: null
+});
+
+const me = reactive({
+    username: "Ng Thi Luong Hau",
+    avatar: '/img01.jpg',
+});
+
+// ===================== MENU ACTIONS =====================
+function goBack() {
+    if (window.history.state && window.history.state.back) {
+        router.back();
+    } else {
+        router.push({ name: 'Home' });
     }
-  } catch (err) {
-    console.error(err)
-    alert('Đã có lỗi xảy ra khi tải bài viết')
+}
+
+async function copyLink() {
+    const url = window.location.href;
+    try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(url);
+        } else {
+            const ta = document.createElement('textarea');
+            ta.value = url;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+        }
+        alert('Đã sao chép liên kết');
+    } catch (err) {
+        console.error(err);
+        alert('Lỗi sao chép');
+    }
+    showMenu.value = false;
+}
+
+function reportPost() {
+    const ok = window.confirm('Bạn muốn báo cáo bài viết này?');
+    if (ok) alert('Đã gửi báo cáo');
+    showMenu.value = false;
+}
+
+// Load user info
+onMounted(() => {
+    const currentUserStr = localStorage.getItem('currentUser')
+    if (currentUserStr) {
+        try {
+            const u = JSON.parse(currentUserStr)
+            if (u.lastName && u.firstName) {
+                me.username = `${u.lastName} ${u.firstName}`
+            }
+        } catch (e) {
+            console.error(e)
+        }
+    }
+    loadPost();
+});
+
+// ===================== LẤY BÀI VIẾT =====================
+async function loadPost() {
+  const idStr = route.params.id;
+  try {
+      const response = await api.get(`/posts/${idStr}`);
+      if (response.data) {
+          post.value = response.data;
+          // Normalize data
+          if (!post.value.comments) post.value.comments = [];
+          if (!post.value.likedBy) post.value.likedBy = [];
+          
+          // Helper to recursively normalize comments
+          if (post.value.comments && post.value.comments.length > 0) {
+              post.value.comments.forEach(normalizeComment);
+          }
+          
+          // Check liked status
+          post.value.liked = post.value.likedBy.includes(me.username);
+      }
+  } catch (error) {
+      console.error("Failed to load post:", error);
+      // alert("Không thể tải bài viết. Có thể bài viết đã bị xóa.");
+      // router.push({ name: 'Home' });
   }
-})
+}
+
+function normalizeComment(c) {
+    if (!c.likes) c.likes = 0;
+    if (!c.likedBy) c.likedBy = [];
+    if (!c.replies) c.replies = [];
+    else c.replies.forEach(normalizeComment);
+}
+
+// ===================== COMPUTED PROPERTIES =====================
+const hasImages = computed(() => {
+  return post.value && ((post.value.images && post.value.images.length > 0) || post.value.image);
+});
 
 const currentImage = computed(() => {
-  if (post.images && post.images.length) return post.images[imageIndex.value] || post.images[0]
-  return post.image
-})
+  if (!post.value) return '';
+  if (post.value.images && post.value.images.length) {
+      return post.value.images[imageIndex.value];
+  }
+  return post.value.image;
+});
 
+// ===================== ẢNH ACTIONS =====================
 function prevImage() {
-  if (!post.images || !post.images.length) return
-  imageIndex.value = (imageIndex.value - 1 + post.images.length) % post.images.length
+  if (!post.value.images) return;
+  imageIndex.value = (imageIndex.value - 1 + post.value.images.length) % post.value.images.length;
 }
 
 function nextImage() {
-  if (!post.images || !post.images.length) return
-  imageIndex.value = (imageIndex.value + 1) % post.images.length
+  if (!post.value.images) return;
+  imageIndex.value = (imageIndex.value + 1) % post.value.images.length;
 }
 
 function gotoImage(i) {
-  imageIndex.value = i
+  imageIndex.value = i;
 }
-function copyPostLink(post) {
-  const url = `${window.location.origin}/post/${post.id}`
-  navigator.clipboard.writeText(url).then(() => {
-    alert('Đã sao chép liên kết bài viết')
-    menuOpen.value = false
-  }).catch(err => {
-    console.error(err)
-    alert('Không thể sao chép liên kết bài viết')
-  })
+
+// ===================== HELPER =====================
+async function updatePostData() {
+    if (!post.value) return;
+    try {
+        await api.patch(`/posts/${post.value.id}`, {
+            likes: post.value.likes,
+            likedBy: post.value.likedBy,
+            comments: post.value.comments
+        });
+        // Dispatch event for other components to update if needed
+        window.dispatchEvent(new Event('post-created')); 
+    } catch (e) {
+        console.error("Error updating post:", e);
+        // Optionally revert state here if creating a robust app
+    }
 }
-function reportPost() {
-    const ok = window.confirm('Bạn muốn báo cáo bài viết này?')
-    if (ok) alert('Đã gửi báo cáo')
-    menuOpen.value = false 
+
+// ===================== USER ACTIONS =====================
+// ========== COMMENT MENU & MANAGEMENT ==========
+function toggleCommentMenu(commentId) {
+    commentMenuOpen.value = commentMenuOpen.value === commentId ? null : commentId;
+}
+
+function startEditComment(comment) {
+    editingCommentId.value = comment.id;
+    editCommentText.value = comment.content;
+    commentMenuOpen.value = null;
+}
+
+async function saveEditComment(comment) {
+    const text = editCommentText.value.trim();
+    if (!text) return;
+    
+    comment.content = text;
+    editingCommentId.value = null;
+    editCommentText.value = "";
+    
+    await updatePostData();
+}
+
+function cancelEditComment() {
+    editingCommentId.value = null;
+    editCommentText.value = "";
+}
+
+function showDeleteModal(comment) {
+    deleteModal.show = true;
+    deleteModal.comment = comment;
+    commentMenuOpen.value = null;
+}
+
+function closeDeleteModal() {
+    deleteModal.show = false;
+    deleteModal.comment = null;
+}
+
+async function executeDeleteComment() {
+    if (!deleteModal.comment || !post.value || !post.value.comments) {
+        closeDeleteModal();
+        return;
+    }
+    
+    post.value.comments = post.value.comments.filter(c => c.id !== deleteModal.comment.id);
+    closeDeleteModal();
+    
+    await updatePostData();
+}
+
+function reportComment(comment) {
+    const ok = window.confirm(`Bạn muốn báo cáo bình luận của ${comment.user}?`);
+    if (ok) {
+        alert('Đã gửi báo cáo');
+    }
+    commentMenuOpen.value = null;
+}
+
+// ========== COMMENT REPLY ==========
+function startReplyComment(comment) {
+    replyingToCommentId.value = comment.id;
+    replyCommentText.value = "";
+}
+
+async function submitReply(comment) {
+    const text = replyCommentText.value.trim();
+    if (!text) return;
+    
+    if (!comment.replies) {
+        comment.replies = [];
+    }
+    
+    const replyId = Date.now().toString(36) + Math.random().toString(36).substr(2);
+    
+    const reply = {
+        id: replyId,
+        user: me.username,
+        content: text,
+        createdAt: Date.now()
+    };
+    
+    comment.replies.push(reply);
+    replyingToCommentId.value = null;
+    replyCommentText.value = "";
+    
+    await updatePostData();
 }
 
 
+
+// ========== COMMENT LIKE ==========
+async function toggleCommentLike(comment) {
+    if (!comment.likes) comment.likes = 0;
+    if (!comment.likedBy) comment.likedBy = [];
+    
+    const username = me.username;
+    const alreadyLiked = comment.likedBy.includes(username);
+    
+    if (alreadyLiked) {
+        comment.likes--;
+        comment.likedBy = comment.likedBy.filter(u => u !== username);
+    } else {
+        comment.likes++;
+        comment.likedBy.push(username);
+    }
+    
+    await updatePostData();
+}
+
+function isCommentLiked(comment) {
+    if (!comment.likedBy) return false;
+    return comment.likedBy.includes(me.username);
+}
+
+// ========== POST LIKE ==========
+async function toggleLike() {
+    if (!post.value) return;
+    if (typeof post.value.likes !== 'number') post.value.likes = 0;
+    if (!post.value.likedBy) post.value.likedBy = [];
+
+    const username = me.username;
+    const alreadyLiked = post.value.likedBy.includes(username);
+
+    if (alreadyLiked) {
+        post.value.likes--;
+        post.value.likedBy = post.value.likedBy.filter(u => u !== username);
+        post.value.liked = false;
+    } else {
+        post.value.likes++;
+        post.value.likedBy.push(username);
+        post.value.liked = true;
+    }
+    
+    await updatePostData();
+}
+
+async function doAddComment() {
+    const content = newComment.value.trim();
+    if (!content || !post.value) return;
+
+    // Generate ID
+    const nextId = Date.now().toString(36) + Math.random().toString(36).substr(2);
+    
+    const c = { 
+        id: nextId, 
+        user: me.username, 
+        content: content, 
+        createdAt: Date.now(),
+        likes: 0,
+        likedBy: [],
+        replies: []
+    };
+
+    if (!post.value.comments) post.value.comments = [];
+    post.value.comments.push(c);
+    
+    newComment.value = "";
+    
+    await updatePostData();
+}
+
+// ===================== HELPER =====================
 function timeAgo(ts) {
-  const delta = Date.now() - ts
-  const s = Math.floor(delta / 1000)
-  if (s < 5) return 'vừa xong'
-  if (s < 60) return `${s} giây trước`
-  const m = Math.floor(s / 60)
-  if (m < 60) return `${m} phút trước`
-  const h = Math.floor(m / 60)
-  if (h < 24) return `${h} giờ trước`
-  const d = Math.floor(h / 24)
-  return `${d} ngày trước`
-}
-
-function addComment() {
-  const t = newComment.value.trim()
-  if (!t) return
-  const nextId = (post.comments && post.comments.length ? Math.max(...post.comments.map(c => c.id)) + 1 : 1)
-  post.comments = [...(post.comments || []), { id: nextId, user: 'me', content: t, createdAt: Date.now() }]
-  newComment.value = ''
-}
-
-function closeMenu() {
-  menuOpen.value = false
-}
-
-function goBack() {
-  if (window.history && window.history.length > 1) {
-    router.back()
-  } else {
-    router.push({ name: 'Home' })
-  }
-  menuOpen.value = false
+  if (!ts) return "";
+  const delta = Date.now() - ts;
+  const sec = Math.floor(delta / 1000);
+  if (sec < 5) return "vừa xong";
+  if (sec < 60) return `${sec} giây trước`;
+  const min = Math.floor(sec / 60);
+  if (min < 60) return `${min} phút trước`;
+  const hr = Math.floor(min / 60);
+  if (hr < 24) return `${hr} giờ trước`;
+  const days = Math.floor(hr / 24);
+  return `${days} ngày trước`;
 }
 </script>
 
 <style scoped>
-.inline-icon-menu{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:40}
-.inline-icon-menu .icon-btn{width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;color:#333;border-radius:6px;text-decoration:none}
-.inline-icon-menu .icon-btn svg{width:20px;height:20px;fill:currentColor}
-.inline-icon-menu .icon-btn:hover{background:rgba(0,0,0,0.04)}
-.inline-icon-menu .icon-btn.router-link-active,.inline-icon-menu .icon-btn.router-link-exact-active{background:#f8f9fa}
-.menu-icon{width:22px;height:22px;fill:black;stroke:black}
-.menu-icon:hover{background:rgba(0,0,0,0.04)}
-.post-image-wrapper{position:relative;min-height:520px;background:#000;display:flex;align-items:center;justify-content:center}
-.post-image-wrapper img{max-height:520px;object-fit:contain}
-.post-image-wrapper .carousel-prev,
-.post-image-wrapper .carousel-next{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.45);color:#fff;border:none;width:40px;height:40px;font-size:20px;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:999px;z-index:6}
-.post-image-wrapper .carousel-prev{left:12px}
-.post-image-wrapper .carousel-next{right:12px}
-.post-image-wrapper .carousel-prev:hover,
-.post-image-wrapper .carousel-next:hover{background:rgba(0,0,0,0.65)}
-.post-image-wrapper .image-dots{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:6}
-.post-image-wrapper .dot{width:8px;height:8px;background:rgba(255,255,255,0.5);border-radius:50%;cursor:pointer}
-.post-image-wrapper .dot.active{background:#fff}
+.carousel-prev,
+.carousel-next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255,255,255, 0.8);
+  color: black;
+  border: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  cursor: pointer;
+}
+.carousel-prev:hover, .carousel-next:hover {
+    background: white;
+}
+.carousel-prev { left: 10px; }
+.carousel-next { right: 10px; }
+
+.image-dots {
+  position: absolute;
+  bottom: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  z-index: 10;
+}
+.dot {
+  width: 6px;
+  height: 6px;
+  background: rgba(255,255,255,0.5);
+  border-radius: 50%;
+  cursor: pointer;
+}
+.dot.active {
+  background: white;
+}
+/* Scrollbar styling for comments */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f1f1; 
+}
+::-webkit-scrollbar-thumb {
+  background: #ccc; 
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #aaa; 
+}
+
+/* ================== DELETE MODAL STYLES ================== */
+.modal {
+  transition: opacity 0.15s linear;
+}
+
+.modal.fade {
+  opacity: 0;
+}
+
+.modal.show {
+  opacity: 1;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.modal-dialog {
+  animation: slideDown 0.3s ease-out;
+}
+
+.modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-backdrop.show {
+  animation: fadeIn 0.15s ease-in-out;
+}
+
+.modal-content {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.modal-header {
+  background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+}
+
+.modal-footer {
+  background: #f8f9fa;
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.btn-danger:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+}
+
+.btn-light:hover {
+  background: #e9ecef;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ================== LAYOUT STYLES ================== */
+@media (min-width: 992px) {
+  .post-left-col, .post-right-col {
+    height: 85vh;
+  }
+}
+@media (max-width: 991px) {
+  .post-left-col {
+    height: 500px;
+  }
+  .post-right-col {
+    height: 600px;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
 </style>
