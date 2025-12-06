@@ -180,7 +180,7 @@
                 <div v-for="post in posts" :key="post.id" class="card mb-4">
                     <div class="card-header bg-white border-0 py-3 d-flex align-items-center justify-content-between">
                         <div class="d-flex align-items-center">
-                            <img :src="post.userAvatar" class="rounded-circle border me-3" width="32" height="32"
+                            <img :src="post.userAvatar" class="rounded-circle border me-3" width="50" height="50"
                                 style="object-fit: cover;" />
                             <div>
                                 <div class="d-flex align-items-center">
@@ -188,10 +188,10 @@
                                     <span class="text-muted mx-1" style="font-size: 12px;">•</span>
                                     <span class="text-muted" style="font-size: 14px;">{{ post.createdAt ?
                                         timeAgo(post.createdAt) : post.time }}</span>
-                                    <span class="text-muted mx-1" style="font-size: 12px;">•</span>
+                                    
                                     
                                 </div>
-                                <div class="text-muted small" style="font-size: 12px; line-height: 1;">{{ post.location
+                                <div class="text-muted small mt-1" style="font-size: 12px; line-height: 1;">{{ post.location
                                     || '' }}</div>
                             </div>
                         </div>
@@ -208,8 +208,9 @@
                                 <div class="list-group list-group-flush text-center">
                                     <button class="list-group-item list-group-item-action text-danger fw-bold py-3"
                                         style="font-size: 14px;" @click="reportPost(post)">Báo cáo</button>
-                                    <button class="list-group-item list-group-item-action text-danger fw-bold py-3"
-                                        style="font-size: 14px;">Bỏ theo dõi</button>
+                                    <button v-if="post.user === me.username" class="list-group-item list-group-item-action text-danger fw-bold py-3"
+                                        style="font-size: 14px;" @click="deletePost(post)">Xóa bài viết</button>
+                                   
                                     <button class="list-group-item list-group-item-action py-3" style="font-size: 14px;"
                                         @click="goToPost(post)">Đi tới bài viết</button>
                                     <button class="list-group-item list-group-item-action py-3" style="font-size: 14px;"
@@ -305,11 +306,14 @@
                                     </svg>
                                 </button>
                             </div>
-                            <button class="btn btn-link p-0 text-dark">
-                                <svg aria-label="Lưu" class="x1lliihq x1n2onr6 x5n08af" fill="currentColor" height="24"
+                            <button class="btn btn-link p-0 text-dark" @click="toggleBookmark(post)">
+                                <svg v-if="!post.bookmarked" aria-label="Lưu" class="x1lliihq x1n2onr6 x5n08af" fill="currentColor" height="24"
                                     role="img" viewBox="0 0 24 24" width="24">
                                     <polygon fill="none" points="20 21 12 13.44 4 21 4 3 20 3 20 21" stroke="currentColor"
                                         stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></polygon>
+                                </svg>
+                                <svg v-else aria-label="Đã lưu" class="x1lliihq x1n2onr6 x5n08af" fill="#fbd400" height="24" role="img" viewBox="0 0 24 24" width="24">
+                                    <polygon points="20 21 12 13.44 4 21 4 3 20 3 20 21"></polygon>
                                 </svg>
                             </button>
                         </div>
@@ -358,7 +362,7 @@
                 <div class=" right-sidebar">
                     <!-- Profile summary -->
                     <div class="d-flex align-items-center mb-3">
-                        <img :src="me.avatar" class="rounded-circle me-3" width="64" height="64" />
+                        <img :src="me.avatar" class="rounded-circle me-3" width="46" height="46" />
                         <div>
                             <div class="fw-bold">{{ me.username }}</div>
                             <div class="text-muted">lghau.18</div>
@@ -455,11 +459,17 @@ const me = reactive({
 
 // Load user from localStorage
 const currentUserStr = localStorage.getItem('currentUser')
+const storedAvatar = localStorage.getItem('userAvatar');
 if (currentUserStr) {
     try {
         const u = JSON.parse(currentUserStr)
         if (u.lastName && u.firstName) {
             me.username = `${u.lastName} ${u.firstName}`
+        }
+        if (storedAvatar) {
+            me.avatar = storedAvatar;
+        } else if (u.avatar) {
+            me.avatar = u.avatar;
         }
     } catch (e) {
         console.error('Error parsing user', e)
@@ -494,6 +504,12 @@ async function loadPosts() {
             }
             // Ensure comments exists
             if (!p.comments) p.comments = [];
+            if (p.bookmarked === undefined) p.bookmarked = false;
+            
+            // Check if post belongs to me, if so, update avatar in case it changed
+            if (p.user === me.username) {
+                p.userAvatar = me.avatar;
+            }
         });
 
         posts.splice(0, posts.length, ...apiPosts);
@@ -558,9 +574,14 @@ async function toggleLike(post) {
     }
 }
 
+async function toggleBookmark(post) {
+    post.bookmarked = !post.bookmarked;
+    // Optional: Persist to API if the backend supported it
+}
+
 const newCommentText = reactive({})
-const commentExpanded = reactive({})
-const commentMenuOpen = reactive({})
+// const commentExpanded = reactive({})
+// const commentMenuOpen = reactive({})
 // const commentEditing = reactive({})
 // const commentEditText = reactive({})
 const deleteModal = reactive({
@@ -622,6 +643,36 @@ function reportPost(post) {
     closePostMenu(post.id)
 }
 
+async function deletePost(post) {
+    const ok = window.confirm('Bạn có chắc chắn muốn xóa bài viết này?')
+    if (!ok) {
+      closePostMenu(post.id)
+      return;
+    }
+
+    // Optimistic remove
+    // const originalPosts = [...posts];
+    const idx = posts.findIndex(p => p.id === post.id);
+    if(idx !== -1) posts.splice(idx, 1);
+
+    try {
+        await api.delete(`/posts/${post.id}`)
+        // Also remove from localStorage if we are caching
+        const stored = JSON.parse(localStorage.getItem('posts') || '[]');
+        const storedIdx = stored.findIndex(p => p.id === post.id);
+        if(storedIdx !== -1) {
+            stored.splice(storedIdx, 1);
+            localStorage.setItem('posts', JSON.stringify(stored));
+        }
+        alert("Đã xóa bài viết thành công!");
+    } catch (e) {
+        console.error("Failed to delete post", e);
+        // post.splice(0, posts.length, ...originalPosts); // Revert if needed, but usually we just alert
+        alert("Xóa thất bại, vui lòng thử lại sau.");
+    }
+    closePostMenu(post.id)
+}
+
 async function addComment(post) {
     const t = (newCommentText[post.id] || '').trim()
     if (!t) return
@@ -663,75 +714,15 @@ async function deleteComment(post, commentId) {
 }
 
 
-function displayedComments(post) {
-    const expanded = !!commentExpanded[post.id]
-    const list = post.comments || []
-    if (expanded) return list
-    const n = 2
-    return list.slice(Math.max(0, list.length - n))
-}
-
-// function isCommentMenuOpen(post, commentId) {
-//     const map = commentMenuOpen[post.id] || {}
-//     return !!map[commentId]
-// }
-
-// function toggleCommentMenu(post, commentId) {
-//     const map = commentMenuOpen[post.id] || {}
-//     const next = { ...map, [commentId]: !map[commentId] }
-//     commentMenuOpen[post.id] = next
-// }
-
-// function startEditComment(post, commentId) {
+// function displayedComments(post) {
+//     const expanded = !!commentExpanded[post.id]
 //     const list = post.comments || []
-//     const target = list.find(c => c.id === commentId)
-//     if (!target || target.user !== me.username) return
-//     const editMap = commentEditing[post.id] || {}
-//     commentEditing[post.id] = { ...editMap, [commentId]: true }
-//     const textMap = commentEditText[post.id] || {}
-//     commentEditText[post.id] = { ...textMap, [commentId]: target.content }
-//     toggleCommentMenu(post, commentId)
+//     if (expanded) return list
+//     const n = 2
+//     return list.slice(Math.max(0, list.length - n))
 // }
-
-// function isEditingComment(post, commentId) {
-//     const map = commentEditing[post.id] || {}
-//     return !!map[commentId]
-// }
-
-// function getCommentEditText(post, commentId) {
-//     const map = commentEditText[post.id] || {}
-//     return map[commentId] || ''
-// }
-
-// function setCommentEditText(post, commentId, val) {
-//     const map = commentEditText[post.id] || {}
-//     commentEditText[post.id] = { ...map, [commentId]: val }
-// }
-
-// async function saveEditComment(post, commentId) {
-//     const list = post.comments || []
-//     const target = list.find(c => c.id === commentId)
-//     if (!target || target.user !== me.username) return
-//     const text = getCommentEditText(post, commentId).trim()
-//     if (!text) return
-//     const ok = window.confirm('Lưu chỉnh sửa bình luận?')
-//     if (!ok) return
-//     
-//     const previousContent = target.content;
-//     target.content = text
-//     const editMap = commentEditing[post.id] || {}
-//     commentEditing[post.id] = { ...editMap, [commentId]: false }
 //
-//     try {
-//         await api.patch(`/posts/${post.id}`, { comments: post.comments });
-//     } catch(err) {
-//         console.error("Error saving comment", err);
-//         target.content = previousContent;
-//         commentEditing[post.id] = { ...editMap, [commentId]: true };
-//         alert("Lỗi lưu bình luận");
-//     }
-// }
-
+//
 function onScroll(e, postId) {
     const el = e.target;
     // Calculate index based on scroll position
@@ -749,14 +740,14 @@ function scrollCarousel(postId, direction) {
     }
 }
 
-function showDeleteModal(post, comment) {
-    deleteModal.show = true
-    deleteModal.comment = comment
-    deleteModal.post = post
-    // Close menu
-    const map = commentMenuOpen[post.id] || {}
-    commentMenuOpen[post.id] = { ...map, [comment.id]: false }
-}
+// function showDeleteModal(post, comment) {
+//     deleteModal.show = true
+//     deleteModal.comment = comment
+//     deleteModal.post = post
+//     // Close menu
+//     const map = commentMenuOpen[post.id] || {}
+//     commentMenuOpen[post.id] = { ...map, [comment.id]: false }
+// }
 
 function closeDeleteModal() {
     deleteModal.show = false
@@ -932,7 +923,7 @@ body {
 }
 
 .card+.card {
-    border-top: 1px solid #eee;
+    border-top: 0px solid #eee;
 }
 
 

@@ -59,7 +59,7 @@
                         </div>
                     </div>
                     <div class="mb-3">
-                        <button class="btn btn-primary me-2">Chỉnh sửa trang cá nhân</button>
+                        <router-link :to="{ name: 'EditProfile' }" class="btn btn-primary me-2">Chỉnh sửa trang cá nhân</router-link>
                     </div>
                 </div>
             </div>
@@ -86,6 +86,7 @@
                                 <h5 class="card-title">Giới thiệu</h5>
                                 <p class="card-text mb-1"><strong>Học vấn:</strong> {{ user.education }}</p>
                                 <p class="card-text mb-1"><strong>Vị trí:</strong> {{ user.location }}</p>
+                                <p class="card-text mb-1" v-if="user.dob"><strong>Ngày sinh:</strong> {{ user.dob }}</p>
                                 <p class="card-text"><strong>Tham gia:</strong> {{ user.joined }}</p>
                             </div>
                         </div>
@@ -95,7 +96,7 @@
                                 <h5 class="card-title">Bạn bè</h5>
                                 <div class="text-muted small mb-2">{{ friends.length }} người bạn</div>
                                 <div class="row g-2">
-                                    <div class="col-4" v-for="f in friends" :key="f.id">
+                                    <div class="col-4" v-for="f in friends.slice(0, 6)" :key="f.id">
                                         <img :src="f.avatar" class="friend-avatar" :alt="f.name" />
                                     </div>
                                 </div>
@@ -122,90 +123,171 @@
                             </div>
                         </div>
 
-                        <div v-for="post in posts" :key="post.id" class="card mb-3">
-                            <div class="card-body">
-                                <div class="d-flex mb-2">
-                                    <img :src="post.user.avatar" class="rounded-circle me-2" width="48" height="48"
-                                        alt="avatar" />
+                        <div v-for="post in posts" :key="post.id" class="card mb-4">
+                            <div class="card-header bg-white border-0 py-3 d-flex align-items-center justify-content-between">
+                                <div class="d-flex align-items-center">
+                                    <img :src="post.userAvatar || '/img01.jpg'" class="rounded-circle border me-3" width="42" height="42"
+                                        style="object-fit: cover;" />
                                     <div>
-                                        <div class="fw-bold">{{ post.user.name }}</div>
-                                        <small class="text-muted">{{ post.createdAt ? timeAgo(post.createdAt) : post.time }}</small>
+                                        <div class="d-flex align-items-center">
+                                            <span class="fw-bold text-dark me-1" style="font-size: 14px;">{{ post.user }}</span>
+                                            <span class="text-muted mx-1" style="font-size: 12px;">•</span>
+                                            <span class="text-muted" style="font-size: 14px;">{{ post.createdAt ?
+                                                timeAgo(post.createdAt) : post.time }}</span>
+                                        </div>
+                                        <div class="text-muted small" style="font-size: 12px; line-height: 1;">{{ post.location || '' }}</div>
                                     </div>
-                                    <div class="ms-auto position-relative">
-                                        <button class="btn btn-sm p-1" @click="toggleMenu(post)">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
-                                                fill="currentColor" viewBox="0 0 16 16">
-                                                <path
-                                                    d="M3 9a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm5 0a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm5-1a1 1 0 1 0-2 0 1 1 0 0 0 2 0z" />
-                                            </svg>
-                                        </button>
-                                        <div v-if="post.showMenu"
-                                            class="position-absolute bg-white border rounded shadow-sm p-2"
-                                            style="right: 0; top: 30px; width: 150px; z-index: 10">
-                                            <div class="dropdown-item py-1" @click="editPost(post)"> Sửa bài viết</div>
-                                            <div class="dropdown-item py-1" @click="deletePost(post)">
-                                                Xóa bài viết
-                                            </div>
-                                            <div class="dropdown-item py-1" @click="hidePost(post)"> Ẩn bài viết</div>
-                                            <div class="dropdown-item py-1  text-muted" @click="post.showMenu = false">Hủy</div>
+                                </div>
+                                <div class="position-relative">
+                                    <button class="btn btn-link text-dark p-0" @click="togglePostMenu(post.id)">
+                                        <svg aria-label="Tùy chọn khác" class="x1lliihq x1n2onr6 x5n08af" fill="currentColor" height="24" role="img" viewBox="0 0 24 24" width="24">
+                                            <circle cx="12" cy="12" r="1.5"></circle>
+                                            <circle cx="6" cy="12" r="1.5"></circle>
+                                            <circle cx="18" cy="12" r="1.5"></circle>
+                                        </svg>
+                                    </button>
+                                    <div v-if="isPostMenuOpen(post.id)" class="card position-absolute shadow-sm"
+                                        style="top: 30px; right: 0; z-index: 100; min-width: 200px; border-radius: 12px; overflow: hidden;">
+                                        <div class="list-group list-group-flush text-center">
+                                            <button class="list-group-item list-group-item-action py-3" style="font-size: 14px;" @click="editPost(post)">Sửa bài viết</button>
+                                            <button class="list-group-item list-group-item-action text-danger py-3" style="font-size: 14px;" @click="deletePost(post)">Xóa bài viết</button>
+                                            <button class="list-group-item list-group-item-action py-3" style="font-size: 14px;" @click="hidePost(post)">Ẩn bài viết</button>
+                                            <button class="list-group-item list-group-item-action py-3" style="font-size: 14px;" @click="closePostMenu(post.id)">Hủy</button>
                                         </div>
                                     </div>
                                 </div>
-                                <p>{{ post.content }}</p>
-                                <div class="post-image position-relative" v-if="(post.images && post.images.length) || post.image">
-                                    <img :src="(post.images && post.images.length) ? post.images[(imageIndex[post.id] || 0)] : post.image"
-                                        class="img-fluid rounded w-100" alt="post image" style="object-fit: cover;" />
+                            </div>
 
-                                    <button v-if="post.images && post.images.length > 1" class="carousel-prev"
-                                        @click="prevImage(post)">‹</button>
-                                    <button v-if="post.images && post.images.length > 1" class="carousel-next"
-                                        @click="nextImage(post)">›</button>
-
-                                    <div v-if="post.images && post.images.length > 1" class="image-dots">
-                                        <span v-for="(img, i) in post.images" :key="i"
-                                            :class="['dot', { active: i === (imageIndex[post.id] || 0) }]"
-                                            @click="gotoImage(post, i)"></span>
-                                    </div>
+                            <!-- Post Image (Scroll Snap Carousel) -->
+                            <div class="post-image position-relative" v-if="(post.images && post.images.length) || post.image">
+                                <div :id="`carousel-${post.id}`" 
+                                    class="d-flex w-100" 
+                                    style="overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; scrollbar-width: none;"
+                                    @scroll="onScroll($event, post.id)">
+                                    
+                                    <template v-if="post.images && post.images.length">
+                                        <img v-for="(img, index) in post.images" :key="index"
+                                            :src="img" 
+                                            class="d-block w-100 flex-shrink-0" 
+                                            style="scroll-snap-align: start; object-fit: cover;" 
+                                            alt="post image" />
+                                    </template>
+                                    <img v-else :src="post.image" 
+                                        class="d-block w-100 flex-shrink-0" 
+                                        style="scroll-snap-align: start; object-fit: cover;" 
+                                        alt="post image" />
                                 </div>
 
-                                <div class="d-flex justify-content-between p-2">
-                                    <div class="d-flex gap-3">
-                                        <!-- Like -->
-                                        <button class="btn p-0" @click="toggleLike(post)">
-                                            <svg v-if="!post.liked" xmlns="http://www.w3.org/2000/svg" width="24"
-                                                height="24" fill="none" stroke="currentColor" stroke-width="2"
-                                                class="bi bi-heart">
+                                <!-- Controls -->
+                                <button v-if="post.images && post.images.length > 1" 
+                                        class="carousel-btn prev"
+                                        @click="scrollCarousel(post.id, -1)" 
+                                        aria-label="Previous image"
+                                        v-show="(imageIndex[post.id] || 0) > 0">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-left" viewBox="0 0 16 16">
+                                        <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z" />
+                                    </svg>
+                                </button>
+                                
+                                <button v-if="post.images && post.images.length > 1" 
+                                        class="carousel-btn next"
+                                        @click="scrollCarousel(post.id, 1)" 
+                                        aria-label="Next image"
+                                        v-show="(imageIndex[post.id] || 0) < post.images.length - 1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-right" viewBox="0 0 16 16">
+                                        <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z" />
+                                    </svg>
+                                </button>
+
+                                <div v-if="post.images && post.images.length > 1" class="image-dots-overlay">
+                                    <span v-for="(img, i) in post.images" :key="i"
+                                        :class="['dot', { active: i === (imageIndex[post.id] || 0) }]">
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="card-body px-3 py-2">
+                                <!-- Action Icons -->
+                                <div class="d-flex align-items-center justify-content-between mb-2">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <button class="btn btn-link p-0 text-dark" @click="toggleLike(post)">
+                                            <svg v-if="!post.liked" aria-label="Thích" class="x1lliihq x1n2onr6 x1roi4f4"
+                                                fill="currentColor" height="24" role="img" viewBox="0 0 24 24" width="24">
                                                 <path
-                                                    d="M20.8 4.6a5.6 5.6 0 0 0-7.9 0L12 5.5l-0.9-0.9a5.6 5.6 0 0 0-7.9 7.9L12 22.1l8.8-9.7a5.6 5.6 0 0 0 0-7.9z" />
+                                                    d="M16.792 3.904A4.989 4.989 0 0 1 21.5 9.122c0 3.072-2.652 4.956-5.197 7.222-2.512 2.243-3.865 3.469-4.303 3.752-.477-.309-2.143-1.823-4.303-3.752C5.141 14.072 2.5 12.167 2.5 9.122a4.989 4.989 0 0 1 4.708-5.218 4.21 4.21 0 0 1 3.675 1.941c.84 1.175.98 1.763 1.12 1.763s.278-.588 1.11-1.766a4.17 4.17 0 0 1 3.679-1.938m0-2a6.04 6.04 0 0 0-4.797 2.127 6.052 6.052 0 0 0-4.787-2.127A6.985 6.985 0 0 0 .5 9.122c0 3.61 2.55 5.827 5.015 7.97.283.246.569.494.853.747l1.027.918a44.998 44.998 0 0 0 3.518 3.018 2 2 0 0 0 2.174 0 45.263 45.263 0 0 0 3.626-3.115l.922-.824c.293-.26.59-.519.885-.774 2.334-2.025 4.98-4.32 4.98-7.94a6.985 6.985 0 0 0-6.708-7.218Z">
+                                                </path>
                                             </svg>
-                                            <svg v-else xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                fill="#e74c3c" viewBox="0 0 24 24">
+                                            <svg v-else aria-label="Bỏ thích" class="x1lliihq x1n2onr6 x1roi4f4 color-red"
+                                                fill="#ff3040" height="24" role="img" viewBox="0 0 48 48" width="24">
                                                 <path
-                                                    d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 6 3.99 4 6.5 4c1.74 0 3.41.81 4.5 2.09C12.09 4.81 13.76 4 15.5 4 18.01 4 20 6 20 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                                                    d="M34.6 3.1c-4.5 0-7.9 1.8-10.6 5.6-2.7-3.7-6.1-5.5-10.6-5.5C6 3.1 0 9.6 0 17.6c0 7.3 5.4 12 10.6 16.5.6.5 1.3 1.1 1.9 1.7l2.3 2c4.4 3.9 6.6 5.9 7.6 6.5.5.3 1.1.5 1.6.5s1.1-.2 1.6-.5c1-.6 2.8-2.2 7.8-6.8l2-1.8c.7-.6 1.3-1.2 2-1.7C42.7 29.6 48 25 48 17.6c0-8-6-14.5-13.4-14.5z">
+                                                </path>
                                             </svg>
                                         </button>
-                                        <!-- Comment -->
-                                        <button class="btn p-0" @click="goToPost(post)">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
-                                                stroke="currentColor" stroke-width="2" class="bi bi-chat">
-                                                <path
-                                                    d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                                        <button class="btn btn-link p-0 text-dark" @click="goToPost(post)">
+                                            <svg aria-label="Bình luận" class="x1lliihq x1n2onr6 x5n08af" fill="currentColor"
+                                                height="24" role="img" viewBox="0 0 24 24" width="24">
+                                                <path d="M20.656 17.008a9.993 9.993 0 1 0-3.59 3.615L22 22Z" fill="none"
+                                                    stroke="currentColor" stroke-linejoin="round" stroke-width="2"></path>
+                                            </svg>
+                                        </button>
+                                        <button class="btn btn-link p-0 text-dark">
+                                            <svg aria-label="Chia sẻ" class="x1lliihq x1n2onr6 x5n08af" fill="currentColor"
+                                                height="24" role="img" viewBox="0 0 24 24" width="24">
+                                                <line fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="2"
+                                                    x1="22" x2="9.218" y1="3" y2="10.083"></line>
+                                                <polygon fill="none" points="11.698 20.334 22 3.001 2 3.001 9.218 10.084 11.698 20.334"
+                                                    stroke="currentColor" stroke-linejoin="round" stroke-width="2"></polygon>
                                             </svg>
                                         </button>
                                     </div>
+                                    <button class="btn btn-link p-0 text-dark" @click="toggleBookmark(post)">
+                                        <svg v-if="!post.bookmarked" aria-label="Lưu" class="x1lliihq x1n2onr6 x5n08af" fill="currentColor" height="24"
+                                            role="img" viewBox="0 0 24 24" width="24">
+                                            <polygon fill="none" points="20 21 12 13.44 4 21 4 3 20 3 20 21" stroke="currentColor"
+                                                stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></polygon>
+                                        </svg>
+                                         <svg v-else aria-label="Đã lưu" class="x1lliihq x1n2onr6 x5n08af" fill="#fbd400" height="24" role="img" viewBox="0 0 24 24" width="24">
+                                            <polygon points="20 21 12 13.44 4 21 4 3 20 3 20 21"></polygon>
+                                        </svg>
+                                    </button>
                                 </div>
 
-                                <!-- Likes and Caption -->
-                                <div class="px-2 pb-2">
-                                    <div class="fw-bold mb-1">{{ post.likes }} lượt thích</div>
-                                    <div class="text-muted small mb-2" v-if="post.comments && post.comments.length" @click="goToPost(post)" style="cursor: pointer;">
+                                <!-- Likes -->
+                                <div class="mb-2">
+                                    <span class="fw-bold text-dark" style="font-size: 14px;">{{ post.likes }} lượt thích</span>
+                                </div>
+
+                                <!-- Caption -->
+                                <div class="mb-2">
+                                    <span class="fw-bold mr-1 me-1" style="font-size: 14px;">{{ post.user }}</span>
+                                    <span class="" style="font-size: 14px;"> {{ post.caption }}</span>
+                                </div>
+
+                                <!-- Link to PostView for comments -->
+                                <div class="mb-2" v-if="post.comments && post.comments.length > 0">
+                                    <button class="btn btn-link p-0 text-muted text-decoration-none" style="font-size: 14px;"
+                                        @click="goToPost(post)">
                                         Xem tất cả {{ post.comments.length }} bình luận
-                                    </div>
+                                    </button>
                                 </div>
 
-                                <!-- Comments List Removed -->
-
-                                <!-- Comment Input Removed -->
+                                <!-- Add Comment -->
+                                <div class="d-flex align-items-center border-top pt-2 mt-2">
+                                    <input :value="newCommentText[post.id] || ''"
+                                        @input="e => newCommentText[post.id] = e.target.value" type="text"
+                                        class="form-control border-0 p-0 shadow-none" placeholder="Bình luận..."
+                                        style="font-size: 14px;">
+                                    <button class="btn btn-link text-decoration-none p-0 fw-bold ml-2" 
+                                        v-if="newCommentText[post.id]"
+                                        @click="addComment(post)" 
+                                        style="font-size: 14px; color: #0095f6;">Đăng</button>
+                                     <button class="btn btn-link text-decoration-none p-0 text-muted ml-2" v-else>
+                                        <svg aria-label="Biểu tượng cảm xúc" class="x1lliihq x1n2onr6 x5n08af" fill="currentColor" height="13" role="img" viewBox="0 0 24 24" width="13">
+                                            <path d="M15.83 10.997a1.167 1.167 0 1 0 1.167 1.167 1.167 1.167 0 0 0-1.167-1.167Zm-6.5 1.167a1.167 1.167 0 1 0-1.166 1.167 1.167 1.167 0 0 0 1.166-1.167Zm5.163 3.24a3.406 3.406 0 0 1-4.982.007 1 1 0 1 0-1.557 1.256 5.397 5.397 0 0 0 8.09 0 1 1 0 0 0-1.55-1.263ZM12 .503a11.5 11.5 0 1 0 11.5 11.5A11.513 11.513 0 0 0 12 .503Zm0 21a9.5 9.5 0 1 1 9.5-9.5 9.51 9.51 0 0 1-9.5 9.5Z"></path>
+                                        </svg>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </main>
@@ -320,6 +402,7 @@ export default {
                 education: "FPT University",
                 joined: "January 2015",
                 avatar: "/img01.jpg",
+                
             },
             friends: [
                 { id: 1, name: "Lê Huyền", avatar: "img36.jpg" },
@@ -328,6 +411,11 @@ export default {
                 { id: 4, name: "Vũ Minh Hương", avatar: "img15.jpg" },
                 { id: 5, name: "Lê Thanh Thư", avatar: "img25.jpg" },
                 { id: 6, name: "Đào Thanh Hiền", avatar: "img23.jpg" },
+                { id: 7, name: "Nguyễn Thùy Linh", avatar: "img46.jpg" },
+                { id: 8, name: "Phạm Mai Anh", avatar: "img47.jpg" },
+                { id: 9, name: "Hoàng Minh Châu", avatar: "img48.jpg" },
+                { id: 10, name: "Vũ Thu Trang", avatar: "img40.jpg" }
+                
             ],
             suggestions: [
                 { id: 1, name: "Lê Thị Ngọc Anh", avatar: "img27.jpg", mutual: 3 },
@@ -337,6 +425,8 @@ export default {
             posts: [],
             imageIndex: {},
             commentMenuOpen: {},
+            newCommentText: {},
+            postMenuOpen: {},
         };
     },
     created() {
@@ -350,11 +440,20 @@ export default {
     methods: {
         loadUser() {
             const currentUserStr = localStorage.getItem('currentUser');
+            const storedAvatar = localStorage.getItem('userAvatar');
             if (currentUserStr) {
                 try {
                     const u = JSON.parse(currentUserStr);
                     if (u.lastName && u.firstName) {
                         this.user.name = `${u.lastName} ${u.firstName}`;
+                    }
+                    if (storedAvatar) {
+                        this.user.avatar = storedAvatar;
+                    } else if (u.avatar) {
+                        this.user.avatar = u.avatar;
+                    }
+                    if (u.dob) {
+                        this.user.dob = u.dob;
                     }
                 } catch (e) {
                     console.error('Error parsing user', e);
@@ -371,15 +470,15 @@ export default {
                     .filter(p => p.user === this.user.name)
                     .map(p => ({
                         ...p,
-                        user: { name: p.user, avatar: p.userAvatar || this.user.avatar },
+                        user: this.user.name, // Force current user name
+                        userAvatar: this.user.avatar, // Force current user avatar
                         image: (p.images && p.images.length) ? p.images[0] : (p.image || null),
                         showMenu: false,
-                        showComments: false,
-                        newComment: "",
                         // Ensure arrays rely on API data, default to empty
                         comments: p.comments || [],
                         likes: p.likes || 0,
-                        liked: p.likedBy ? p.likedBy.includes(this.user.name) : false
+                        liked: p.likedBy ? p.likedBy.includes(this.user.name) : false,
+                        bookmarked: p.bookmarked !== undefined ? p.bookmarked : false,
                     }));
                 
                 // Sort descending by createdAt
@@ -429,9 +528,18 @@ export default {
                 alert("Không thể đăng bài. Vui lòng thử lại.");
             }
         },
+        togglePostMenu(postId) {
+            this.postMenuOpen[postId] = !this.postMenuOpen[postId];
+        },
+        isPostMenuOpen(postId) {
+            return !!this.postMenuOpen[postId];
+        },
+        closePostMenu(postId) {
+            this.postMenuOpen[postId] = false;
+        },
+        // Legacy support
         toggleMenu(post) {
-            this.posts.forEach(p => p.showMenu = false);
-            post.showMenu = !post.showMenu;
+            this.togglePostMenu(post.id);
         },
         async editPost(post) {
             const newText = prompt("Nhập nội dung mới:", post.content || post.caption);
@@ -444,7 +552,7 @@ export default {
                 // Optimistic update
                 post.content = newText;
                 post.caption = newText;
-                post.showMenu = false;
+                this.closePostMenu(post.id);
 
                 try {
                     await api.patch(`/posts/${post.id}`, updatedFields);
@@ -470,11 +578,11 @@ export default {
         },
         async hidePost(post) {
             post.hidden = true;
-            post.showMenu = false;
+            this.closePostMenu(post.id);
             // "Hide" is usually local only, unless we have a 'hidden' field in DB
         },
         async addComment(post) {
-            const t = (post.newComment || '').trim();
+            const t = (this.newCommentText[post.id] || '').trim();
             if (!t) return;
             
             const nextId = Date.now().toString(36) + Math.random().toString(36).substr(2);
@@ -491,7 +599,7 @@ export default {
             // Optimistic update
             const updatedComments = [...(post.comments || []), c];
             post.comments = updatedComments;
-            post.newComment = '';
+            this.newCommentText[post.id] = '';
 
             try {
                 await api.patch(`/posts/${post.id}`, { comments: updatedComments });
@@ -502,25 +610,36 @@ export default {
                 this.loadPosts(); // Revert
             }
         },
+        // onScroll and scrollCarousel for the new carousel
+        onScroll(e, postId) {
+            const el = e.target;
+            const index = Math.round(el.scrollLeft / el.clientWidth);
+            if (this.imageIndex[postId] !== index) {
+                this.imageIndex[postId] = index;
+            }
+        },
+        scrollCarousel(postId, direction) {
+            const container = document.getElementById(`carousel-${postId}`);
+            if (container) {
+                const scrollAmount = container.clientWidth * direction;
+                container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+            }
+        },
         prevImage(post) {
-            const id = post.id;
-            const imgs = post.images || [];
-            if (!imgs.length) return;
-            const idx = this.imageIndex[id] || 0;
-            this.imageIndex[id] = (idx + imgs.length - 1) % imgs.length;
+            this.scrollCarousel(post.id, -1);
         },
         nextImage(post) {
-            const id = post.id;
-            const imgs = post.images || [];
-            if (!imgs.length) return;
-            const idx = this.imageIndex[id] || 0;
-            this.imageIndex[id] = (idx + 1) % imgs.length;
+            this.scrollCarousel(post.id, 1);
         },
         gotoImage(post, i) {
-            const id = post.id;
-            const imgs = post.images || [];
-            if (!imgs.length) return;
-            this.imageIndex[id] = i % imgs.length;
+             const container = document.getElementById(`carousel-${post.id}`);
+             if (container) {
+                 container.scrollTo({ left: container.clientWidth * i, behavior: 'smooth' });
+             }
+        },
+        async toggleBookmark(post) {
+            post.bookmarked = !post.bookmarked;
+            // API call would go here
         },
         async toggleLike(post) {
             if (typeof post.likes !== 'number') post.likes = 0;
@@ -727,47 +846,49 @@ export default {
 }
 
 /* Carousel Styles */
-.post-image .carousel-prev,
-.post-image .carousel-next {
+.post-image .carousel-btn {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    background: rgba(0, 0, 0, 0.45);
-    color: #fff;
+    background: rgba(255, 255, 255, 0.85); /* Light background for IG style */
+    color: #000;
     border: none;
-    width: 32px;
-    height: 32px;
-    font-size: 18px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    font-size: 16px;
     display: flex;
     align-items: center;
     justify-content: center;
-    text-align: center;
     cursor: pointer;
-    border-radius: 50%;
     z-index: 6;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transition: all 0.2s ease;
+    padding: 0;
 }
 
-.post-image .carousel-prev {
+.post-image .carousel-btn.prev {
     left: 10px;
 }
 
-.post-image .carousel-next {
+.post-image .carousel-btn.next {
     right: 10px;
 }
 
-.post-image .carousel-prev:hover,
-.post-image .carousel-next:hover {
-    background: rgba(0, 0, 0, 0.65);
+.post-image .carousel-btn:hover {
+    background: #fff;
+    transform: translateY(-50%) scale(1.1);
 }
 
-.post-image .image-dots {
+.post-image .image-dots-overlay {
     position: absolute;
-    bottom: 10px;
+    bottom: 15px;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
-    gap: 5px;
+    gap: 6px;
     z-index: 6;
+    pointer-events: none;
 }
 
 .post-image .dot {
@@ -776,10 +897,14 @@ export default {
     background: rgba(255, 255, 255, 0.5);
     border-radius: 50%;
     cursor: pointer;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    transition: all 0.2s ease;
+    pointer-events: auto;
 }
 
 .post-image .dot.active {
     background: #fff;
+    transform: scale(1.2);
 }
 
 .photo-item {

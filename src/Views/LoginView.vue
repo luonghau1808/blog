@@ -117,14 +117,30 @@ async function handleLogin() {
     if (!validate()) return
 
     try {
-        // 🔎 Tìm user trong Fake API
-        const res = await axios.get(`${API}?contact=${email.value}&password=${password.value}`)
+        const input = email.value.trim();
+        const pass = password.value;
+
+        
+        let res = await axios.get(`${API}?email=${input}&password=${pass}`)
+        
+        
+        if (res.data.length === 0) {
+            res = await axios.get(`${API}?phoneNumber=${input}&password=${pass}`)
+        }
+
+       
+        if (res.data.length === 0) {
+            res = await axios.get(`${API}?contact=${input}&password=${pass}`)
+        }
 
         if (res.data.length > 0) {
             const user = res.data[0]
 
-            // ✔ Lưu phiên đăng nhập
+            
             localStorage.setItem("currentUser", JSON.stringify(user))
+
+            
+            localStorage.setItem("userAvatar", user.avatar || "");
 
             alert("Đăng nhập thành công!")
             router.push({ name: "Home" })
