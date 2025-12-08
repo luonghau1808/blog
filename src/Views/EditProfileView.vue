@@ -4,7 +4,7 @@
       <div class="col-md-8 col-lg-6">
         <div class="card shadow-sm">
           <div class="card-header bg-white border-bottom-0 pt-4 pb-0">
-            <h4 class="fw-bold mb-0">Chỉnh sửa thông tin cá nhân</h4>
+            <h4 class="fw-bold mb-2 text-center">Chỉnh sửa thông tin cá nhân</h4>
           </div>
           <div class="card-body">
             <form @submit.prevent="saveProfile">
@@ -24,18 +24,15 @@
                     <input type="file" class="form-control" @change="onFileChange" accept="image/*">
                 </div>
                 <!-- fallback text input if needed, or just rely on file -->
-                <div class="form-text">Chọn ảnh từ thiết bị của bạn (sẽ được lưu dưới dạng base64).</div>
+                <div class="form-text">Chọn ảnh từ thiết bị của bạn</div>
               </div>
 
               <div class="row">
-                <div class="col-md-6 mb-3">
+                <div class="">
                   <label class="form-label">Ngày sinh</label>
                   <input v-model="form.dob" type="date" class="form-control">
                 </div>
-                <div class="col-md-6 mb-3">
-                   <label class="form-label">Số điện thoại</label>
-                   <input v-model="form.phoneNumber" type="tel" class="form-control" placeholder="09xxxxxxxx">
-                </div>
+               
               </div>
 
               <div class="row">
@@ -53,12 +50,6 @@
                 <label class="form-label">Email</label>
                 <input v-model="form.email" type="email" class="form-control" required>
               </div>
-
-              <div class="mb-3">
-                <label class="form-label">Mật khẩu mới (Để trống nếu không đổi)</label>
-                <input v-model="form.password" type="password" class="form-control" placeholder="******">
-              </div>
-
               <div class="d-flex justify-content-end gap-2 mt-4">
                 <router-link :to="{ name: 'Profile' }" class="btn btn-secondary">Hủy</router-link>
                 <button type="submit" class="btn btn-primary">Lưu thay đổi</button>

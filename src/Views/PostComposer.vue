@@ -19,11 +19,6 @@
                      class="d-none" multiple @change="onFileChange" />
               <i class="bi bi-image"></i> 🖼️Ảnh/Video
             </label>
-
-            <button class="btn btn-light btn-sm">
-              <i class="bi bi-emoji-smile"></i> 🙂Cảm xúc
-            </button>
-
             <button class="btn btn-light btn-sm" @click="toggleLocation">
               <i class="bi bi-geo-alt"></i> 📍Địa điểm
             </button>
@@ -69,7 +64,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import api from '@/services/api'   // ⬅ file api.js đã tạo
+import api from '@/services/api'   
 
 const emit = defineEmits(['close'])
 

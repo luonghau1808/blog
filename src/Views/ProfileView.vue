@@ -36,8 +36,31 @@
                     </div>
                 </div>
                 <div class="d-flex gap-3">
-                    <div class="rounded-circle overflow-hidden" style="width: 32px; height: 32px">
-                        <img src="/img01.jpg" class="w-100 h-100 object-fit-cover" alt="avatar" />
+                    <a href="#" title="Thông báo" class="position-relative mt-1">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="24" height="24">
+      <path d="M320 64C306.7 64 296 74.7 296 88L296 97.7C214.6 109.3 152 179.4 152 264L152 278.5C152 316.2 142 353.2 123 385.8L101.1 423.2C97.8 429 96 435.5 96 442.2C96 463.1 112.9 480 133.8 480L506.2 480C527.1 480 544 463.1 544 442.2C544 435.5 542.2 428.9 538.9 423.2L517 385.7C498 353.1 488 316.1 488 278.4L488 263.9C488 179.3 425.4 109.2 344 97.6L344 87.9C344 74.6 333.3 63.9 320 63.9zM488.4 432L151.5 432L164.4 409.9C187.7 370 200 324.6 200 278.5L200 264C200 197.7 253.7 144 320 144C386.3 144 440 197.7 440 264L440 278.5C440 324.7 452.3 370 475.5 409.9L488.4 432zM252.1 528C262 556 288.7 576 320 576C351.3 576 378 556 387.9 528L252.1 528z"/>
+    </svg>
+
+    <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"></span>
+  </a>
+                    <div class="position-relative">
+                        <div class="rounded-circle overflow-hidden cursor-pointer" style="width: 32px; height: 32px; cursor: pointer;"
+                            @click="toggleUserMenu">
+                            <img :src="user.avatar" class="w-100 h-100 object-fit-cover" alt="avatar" />
+                        </div>
+                        
+                        <!-- User Dropdown Menu -->
+                        <div v-if="showUserMenu" class="card position-absolute shadow-sm overflow-hidden"
+                            style="top: 100%; right: 0; z-index: 1000; min-width: 180px; margin-top: 10px;">
+                        <div class="list-group list-group-flush text-start">
+                            <button class="list-group-item list-group-item-action small" @click="openChangePasswordModal">
+                            <i class="bi bi-key me-2"></i>Đổi mật khẩu
+                            </button>
+                            <button class="list-group-item list-group-item-action text-danger small" @click="logout">
+                            <i class="bi bi-box-arrow-right me-2"></i>Đăng xuất
+                            </button>
+                        </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -151,7 +174,7 @@
                                         <div class="list-group list-group-flush text-center">
                                             <button class="list-group-item list-group-item-action py-3" style="font-size: 14px;" @click="editPost(post)">Sửa bài viết</button>
                                             <button class="list-group-item list-group-item-action text-danger py-3" style="font-size: 14px;" @click="deletePost(post)">Xóa bài viết</button>
-                                            <button class="list-group-item list-group-item-action py-3" style="font-size: 14px;" @click="hidePost(post)">Ẩn bài viết</button>
+                                           
                                             <button class="list-group-item list-group-item-action py-3" style="font-size: 14px;" @click="closePostMenu(post.id)">Hủy</button>
                                         </div>
                                     </div>
@@ -363,7 +386,7 @@
                                         <img :src="p" class="img-fluid rounded photo-item" alt="photo" />
                                     </div>
                                 </div>
-                                <a href="#" class="d-block text-decoration-none mt-2">Xem tất cả ảnh</a>
+                                
                             </div>
                         </div>
 
@@ -379,6 +402,57 @@
         </div>
     </div>
     <PostComposer v-if="showComposer" @close="showComposer = false" />
+
+    <!-- ================== CHANGE PASSWORD MODAL ================== -->
+    <div class="modal fade" :class="{ show: changePasswordModal.show }" :style="{ display: changePasswordModal.show ? 'block' : 'none' }"
+         tabindex="-1" @click.self="closeChangePasswordModal">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+          <div class="modal-header border-0 pb-0">
+            <h5 class="modal-title fw-bold">Đổi mật khẩu</h5>
+            <button type="button" class="btn-close" @click="closeChangePasswordModal"></button>
+          </div>
+          <div class="modal-body pt-3">
+            <form @submit.prevent="submitChangePassword">
+              <div class="mb-3">
+                <label class="form-label small fw-bold">Mật khẩu hiện tại</label>
+                <div class="input-group">
+                  <input :type="showPass.current ? 'text' : 'password'" v-model="changePassForm.current" class="form-control" required />
+                  <button class="btn btn-outline-secondary" type="button" @click="showPass.current = !showPass.current" style="min-width: 60px;">
+                    {{ showPass.current ? 'Ẩn' : 'Hiện' }}
+                  </button>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label small fw-bold">Mật khẩu mới</label>
+                <div class="input-group">
+                  <input :type="showPass.new ? 'text' : 'password'" v-model="changePassForm.new" class="form-control" required />
+                  <button class="btn btn-outline-secondary" type="button" @click="showPass.new = !showPass.new" style="min-width: 60px;">
+                    {{ showPass.new ? 'Ẩn' : 'Hiện' }}
+                  </button>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label small fw-bold">Nhập lại mật khẩu mới</label>
+                 <div class="input-group">
+                  <input :type="showPass.confirm ? 'text' : 'password'" v-model="changePassForm.confirm" class="form-control" required />
+                  <button class="btn btn-outline-secondary" type="button" @click="showPass.confirm = !showPass.confirm" style="min-width: 60px;">
+                    {{ showPass.confirm ? 'Ẩn' : 'Hiện' }}
+                  </button>
+                </div>
+              </div>
+              <div v-if="changePassForm.error" class="text-danger small mb-3">{{ changePassForm.error }}</div>
+              
+              <div class="d-flex justify-content-end gap-2">
+                <button type="button" class="btn btn-light" @click="closeChangePasswordModal">Hủy</button>
+                <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div v-if="changePasswordModal.show" class="modal-backdrop fade show" style="z-index: 1050;"></div>
 </template>
 
 <script>
@@ -402,7 +476,20 @@ export default {
                 education: "FPT University",
                 joined: "January 2015",
                 avatar: "/img01.jpg",
-                
+                id: null
+            },
+            showUserMenu: false,
+            changePasswordModal: { show: false },
+            changePassForm: {
+                current: '',
+                new: '',
+                confirm: '',
+                error: ''
+            },
+            showPass: {
+                current: false,
+                new: false,
+                confirm: false
             },
             friends: [
                 { id: 1, name: "Lê Huyền", avatar: "img36.jpg" },
@@ -454,6 +541,9 @@ export default {
                     }
                     if (u.dob) {
                         this.user.dob = u.dob;
+                    }
+                    if (u.id) {
+                        this.user.id = u.id;
                     }
                 } catch (e) {
                     console.error('Error parsing user', e);
@@ -728,6 +818,57 @@ export default {
         },
         reportComment(comment) {
             alert(`Đã báo cáo bình luận của ${comment.user}`);
+        },
+        toggleUserMenu() {
+            this.showUserMenu = !this.showUserMenu;
+        },
+        logout() {
+            const ok = window.confirm("Bạn có chắc chắn muốn đăng xuất?");
+            if (!ok) return;
+            localStorage.removeItem('currentUser');
+            localStorage.removeItem('userAvatar');
+            this.$router.push({ name: 'Login' });
+        },
+        openChangePasswordModal() {
+            this.showUserMenu = false;
+            this.changePassForm = { current: '', new: '', confirm: '', error: '' };
+            this.showPass = { current: false, new: false, confirm: false };
+            this.changePasswordModal.show = true;
+        },
+        closeChangePasswordModal() {
+            this.changePasswordModal.show = false;
+        },
+        async submitChangePassword() {
+            this.changePassForm.error = '';
+            const { current, new: newPass, confirm } = this.changePassForm;
+            if (!current || !newPass || !confirm) {
+                this.changePassForm.error = 'Vui lòng điền đầy đủ thông tin.';
+                return;
+            }
+            if (newPass !== confirm) {
+                this.changePassForm.error = 'Mật khẩu mới không khớp.';
+                return;
+            }
+            if (!this.user.id) {
+                this.changePassForm.error = 'Không tìm thấy thông tin người dùng.';
+                return;
+            }
+            try {
+                const res = await api.get(`/users/${this.user.id}`);
+                const user = res.data;
+                if (!user || user.password !== current) {
+                    this.changePassForm.error = 'Mật khẩu hiện tại không đúng.';
+                    return;
+                }
+                await api.patch(`/users/${this.user.id}`, { password: newPass });
+                user.password = newPass;
+                localStorage.setItem('currentUser', JSON.stringify(user));
+                alert('Đổi mật khẩu thành công!');
+                this.closeChangePasswordModal();
+            } catch (err) {
+                console.error(err);
+                this.changePassForm.error = 'Đã có lỗi xảy ra.';
+            }
         },
     },
 };

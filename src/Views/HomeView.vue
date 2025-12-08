@@ -4,7 +4,7 @@
             <div class="container-fluid d-flex justify-content-between align-items-center position-relative">
                 <div class="d-flex align-items-center gap-3">
                     <a class="navbar-brand mb-0 h1 fw-bold" href="#">MyBlog</a>
-                    <!-- Inline icon-only menu (same row as brand) -->
+
                     <form class="d-none d-sm-block">
                         <input class="form-control form-control-sm rounded-pill" style="width:240px"
                             placeholder="Tìm kiếm" />
@@ -37,18 +37,34 @@
                     </div>
                 </div>
                 <div class="d-flex align-items-center gap-4 ms-auto">
-  <!-- Notification -->
+
   <a href="#" title="Thông báo" class="position-relative">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="24" height="24">
       <path d="M320 64C306.7 64 296 74.7 296 88L296 97.7C214.6 109.3 152 179.4 152 264L152 278.5C152 316.2 142 353.2 123 385.8L101.1 423.2C97.8 429 96 435.5 96 442.2C96 463.1 112.9 480 133.8 480L506.2 480C527.1 480 544 463.1 544 442.2C544 435.5 542.2 428.9 538.9 423.2L517 385.7C498 353.1 488 316.1 488 278.4L488 263.9C488 179.3 425.4 109.2 344 97.6L344 87.9C344 74.6 333.3 63.9 320 63.9zM488.4 432L151.5 432L164.4 409.9C187.7 370 200 324.6 200 278.5L200 264C200 197.7 253.7 144 320 144C386.3 144 440 197.7 440 264L440 278.5C440 324.7 452.3 370 475.5 409.9L488.4 432zM252.1 528C262 556 288.7 576 320 576C351.3 576 378 556 387.9 528L252.1 528z"/>
     </svg>
-    <!-- Badge thông báo nếu muốn -->
+
     <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"></span>
   </a>
 
-  <!-- Avatar -->
-  <div class="rounded-circle overflow-hidden" style="width:32px;height:32px;">
-    <img src="/img01.jpg" class="w-100 h-100 object-fit-cover" alt="avatar" />
+
+  <div class="position-relative">
+    <div class="rounded-circle overflow-hidden cursor-pointer" style="width:32px;height:32px; cursor: pointer;"
+         @click="toggleUserMenu">
+      <img :src="me.avatar" class="w-100 h-100 object-fit-cover" alt="avatar" />
+    </div>
+    
+    <!-- User Dropdown Menu -->
+    <div v-if="showUserMenu" class="card position-absolute shadow-sm overflow-hidden"
+         style="top: 100%; right: 0; z-index: 1000; min-width: 180px; margin-top: 10px;">
+      <div class="list-group list-group-flush text-start">
+        <button class="list-group-item list-group-item-action small" @click="openChangePasswordModal">
+          <i class="bi bi-key me-2"></i>Đổi mật khẩu
+        </button>
+        <button class="list-group-item list-group-item-action text-danger small" @click="logout">
+          <i class="bi bi-box-arrow-right me-2"></i>Đăng xuất
+        </button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -156,13 +172,13 @@
                     </div>
                 </aside>
             </div>
-            <!-- Main feed -->
+
             <div class="col-lg-6 ">
-                <!-- Top bar -->
+
                 <div class="d-flex align-items-center justify-content-between mb-3">
                     <h4 class="mb-0">Story</h4>
                 </div>
-                <!-- Stories -->
+
                 <div class="bg-white p-3 rounded shadow-sm mb-3">
                     <div class="d-flex gap-3 overflow-auto">
                         <div v-for="story in stories" :key="story.id" class="text-center" style="min-width: 84px">
@@ -175,7 +191,7 @@
                 </div>
 
 
-                <!-- Posts -->
+
 
                 <div v-for="post in posts" :key="post.id" class="card mb-4">
                     <div class="card-header bg-white border-0 py-3 d-flex align-items-center justify-content-between">
@@ -222,8 +238,8 @@
                         </div>
                     </div>
 
-                    <!-- Post Image -->
-                    <!-- Post Image (Scroll Snap Carousel) -->
+
+
                     <div class="post-image position-relative" v-if="(post.images && post.images.length) || post.image">
                         <div :id="`carousel-${post.id}`" 
                              class="d-flex w-100" 
@@ -243,7 +259,7 @@
                                  alt="post image" />
                         </div>
 
-                        <!-- Controls -->
+
                         <button v-if="post.images && post.images.length > 1" 
                                 class="carousel-btn prev"
                                 @click="scrollCarousel(post.id, -1)" 
@@ -272,7 +288,7 @@
                     </div>
 
                     <div class="card-body px-3 py-2">
-                        <!-- Action Icons -->
+
                         <div class="d-flex align-items-center justify-content-between mb-2">
                             <div class="d-flex align-items-center gap-3">
                                 <button class="btn btn-link p-0 text-dark" @click="toggleLike(post)">
@@ -318,18 +334,18 @@
                             </button>
                         </div>
 
-                        <!-- Likes -->
+
                         <div class="mb-2">
                             <span class="fw-bold text-dark" style="font-size: 14px;">{{ post.likes }} lượt thích</span>
                         </div>
 
-                        <!-- Caption -->
+
                         <div class="mb-2">
                             <span class="fw-bold mr-1 me-1" style="font-size: 14px;">{{ post.user }}</span>
                             <span class="" style="font-size: 14px;"> {{ post.caption }}</span>
                         </div>
 
-                        <!-- Link to PostView for comments -->
+
                         <div class="mb-2" v-if="post.comments && post.comments.length > 0">
                             <button class="btn btn-link p-0 text-muted text-decoration-none" style="font-size: 14px;"
                                 @click="goToPost(post)">
@@ -337,7 +353,7 @@
                             </button>
                         </div>
 
-                        <!-- Add Comment -->
+
                         <div class="d-flex align-items-center border-top pt-2 mt-2">
                             <input :value="newCommentText[post.id] || ''"
                                 @input="e => newCommentText[post.id] = e.target.value" type="text"
@@ -357,10 +373,10 @@
                 </div>
             </div>
 
-            <!-- Right sidebar -->
+
             <div class="col-lg-3 d-none d-lg-block ">
                 <div class=" right-sidebar">
-                    <!-- Profile summary -->
+
                     <div class="d-flex align-items-center mb-3">
                         <img :src="me.avatar" class="rounded-circle me-3" width="46" height="46" />
                         <div>
@@ -370,7 +386,7 @@
                         <div class="ms-auto text-primary">Chuyển</div>
                     </div>
 
-                    <!-- Suggestions -->
+
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <small class="text-muted">Gợi ý cho bạn</small>
                         <small class="text-muted">Xem tất cả</small>
@@ -399,7 +415,7 @@
     </div>
     <PostComposer v-if="showComposer" @close="showComposer = false" />
     
-    <!-- ================== DELETE COMMENT MODAL ================== -->
+
     <div class="modal fade" :class="{ show: deleteModal.show }" :style="{ display: deleteModal.show ? 'block' : 'none' }" 
          tabindex="-1" @click.self="closeDeleteModal">
       <div class="modal-dialog modal-dialog-centered">
@@ -442,8 +458,59 @@
       </div>
     </div>
     
-    <!-- Modal backdrop -->
+
     <div v-if="deleteModal.show" class="modal-backdrop fade show"></div>
+
+    <!-- ================== CHANGE PASSWORD MODAL ================== -->
+    <div class="modal fade" :class="{ show: changePasswordModal.show }" :style="{ display: changePasswordModal.show ? 'block' : 'none' }"
+         tabindex="-1" @click.self="closeChangePasswordModal">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+          <div class="modal-header border-0 pb-0">
+            <h5 class="modal-title fw-bold">Đổi mật khẩu</h5>
+            <button type="button" class="btn-close" @click="closeChangePasswordModal"></button>
+          </div>
+          <div class="modal-body pt-3">
+            <form @submit.prevent="submitChangePassword">
+              <div class="mb-3">
+                <label class="form-label small fw-bold">Mật khẩu hiện tại</label>
+                <div class="input-group">
+                  <input :type="showPass.current ? 'text' : 'password'" v-model="changePassForm.current" class="form-control" required />
+                  <button class="btn btn-outline-secondary" type="button" @click="showPass.current = !showPass.current" style="min-width: 60px;">
+                    {{ showPass.current ? 'Ẩn' : 'Hiện' }}
+                  </button>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label small fw-bold">Mật khẩu mới</label>
+                <div class="input-group">
+                  <input :type="showPass.new ? 'text' : 'password'" v-model="changePassForm.new" class="form-control" required />
+                  <button class="btn btn-outline-secondary" type="button" @click="showPass.new = !showPass.new" style="min-width: 60px;">
+                    {{ showPass.new ? 'Ẩn' : 'Hiện' }}
+                  </button>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label small fw-bold">Nhập lại mật khẩu mới</label>
+                 <div class="input-group">
+                  <input :type="showPass.confirm ? 'text' : 'password'" v-model="changePassForm.confirm" class="form-control" required />
+                  <button class="btn btn-outline-secondary" type="button" @click="showPass.confirm = !showPass.confirm" style="min-width: 60px;">
+                    {{ showPass.confirm ? 'Ẩn' : 'Hiện' }}
+                  </button>
+                </div>
+              </div>
+              <div v-if="changePassForm.error" class="text-danger small mb-3">{{ changePassForm.error }}</div>
+              
+              <div class="d-flex justify-content-end gap-2">
+                <button type="button" class="btn btn-light" @click="closeChangePasswordModal">Hủy</button>
+                <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div v-if="changePasswordModal.show" class="modal-backdrop fade show" style="z-index: 1050;"></div>
 </template>
 
 <script setup>
@@ -455,9 +522,24 @@ import api from "@/services/api";
 const me = reactive({
     username: "Ng Thi Luong Hau",
     avatar: '/img01.jpg',
+    id: null
 });
 
-// Load user from localStorage
+const showUserMenu = ref(false);
+const changePasswordModal = reactive({ show: false });
+const changePassForm = reactive({
+    current: '',
+    new: '',
+    confirm: '',
+    error: ''
+});
+const showPass = reactive({
+    current: false,
+    new: false,
+    confirm: false
+});
+
+
 const currentUserStr = localStorage.getItem('currentUser')
 const storedAvatar = localStorage.getItem('userAvatar');
 if (currentUserStr) {
@@ -465,6 +547,9 @@ if (currentUserStr) {
         const u = JSON.parse(currentUserStr)
         if (u.lastName && u.firstName) {
             me.username = `${u.lastName} ${u.firstName}`
+        }
+        if (u.id) {
+            me.id = u.id;
         }
         if (storedAvatar) {
             me.avatar = storedAvatar;
@@ -477,12 +562,12 @@ if (currentUserStr) {
 }
 
 const stories = [
-    { id: 1, user: "wyn.anh", avatar: '/img27.jpg' },
-    { id: 2, user: "_ttqueen", avatar: '/img21.jpg' },
-    { id: 3, user: "buncry3107", avatar: '/img12.jpg' },
-    { id: 4, user: "_imfifteen", avatar: '/img16.jpg' },
-    { id: 5, user: "thvievy", avatar: '/img03.jpg' },
-    { id: 6, user: "_dino.makeup", avatar: '/img09.jpg' },
+    { id: 1, user: "Quynh Anh", avatar: '/img27.jpg' },
+    { id: 2, user: "Hải Yến", avatar: '/img21.jpg' },
+    { id: 3, user: "Lê Linh", avatar: '/img12.jpg' },
+    { id: 4, user: "Hà Vy", avatar: '/img16.jpg' },
+    { id: 5, user: "Nguyen Anh Thu", avatar: '/img03.jpg' },
+    { id: 6, user: "Diep Lam Anh", avatar: '/img09.jpg' },
 ];
 
 const posts = reactive([]);
@@ -492,21 +577,21 @@ async function loadPosts() {
         const res = await api.get('/posts');
         const apiPosts = res.data || [];
 
-        // Sort by newst
+
         apiPosts.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
 
-        // Update 'liked' state for current user
+
         apiPosts.forEach(p => {
             if (p.likedBy && Array.isArray(p.likedBy)) {
                 p.liked = p.likedBy.includes(me.username);
             } else {
                 p.liked = false;
             }
-            // Ensure comments exists
+
             if (!p.comments) p.comments = [];
             if (p.bookmarked === undefined) p.bookmarked = false;
             
-            // Check if post belongs to me, if so, update avatar in case it changed
+
             if (p.user === me.username) {
                 p.userAvatar = me.avatar;
             }
@@ -515,7 +600,7 @@ async function loadPosts() {
         posts.splice(0, posts.length, ...apiPosts);
     } catch (err) {
         console.error("Error loading posts from API:", err);
-        // Fallback to localStorage if API fails (optional, removing staticPosts per request to use API)
+
         const storedPosts = JSON.parse(localStorage.getItem('posts') || '[]');
         posts.splice(0, posts.length, ...storedPosts);
     }
@@ -523,10 +608,10 @@ async function loadPosts() {
 
 loadPosts();
 
-// Listen for new posts
+
 window.addEventListener('post-created', loadPosts);
 
-// per-post image index
+
 const imageIndex = reactive({})
 
 
@@ -560,7 +645,7 @@ async function toggleLike(post) {
         });
     } catch (err) {
         console.error("Failed to toggle like", err);
-        // Revert
+
         if (alreadyLiked) {
             post.likes++;
             post.likedBy.push(username);
@@ -576,14 +661,14 @@ async function toggleLike(post) {
 
 async function toggleBookmark(post) {
     post.bookmarked = !post.bookmarked;
-    // Optional: Persist to API if the backend supported it
+
 }
 
 const newCommentText = reactive({})
-// const commentExpanded = reactive({})
-// const commentMenuOpen = reactive({})
-// const commentEditing = reactive({})
-// const commentEditText = reactive({})
+
+
+
+
 const deleteModal = reactive({
     show: false,
     comment: null,
@@ -650,14 +735,14 @@ async function deletePost(post) {
       return;
     }
 
-    // Optimistic remove
-    // const originalPosts = [...posts];
+
+
     const idx = posts.findIndex(p => p.id === post.id);
     if(idx !== -1) posts.splice(idx, 1);
 
     try {
         await api.delete(`/posts/${post.id}`)
-        // Also remove from localStorage if we are caching
+
         const stored = JSON.parse(localStorage.getItem('posts') || '[]');
         const storedIdx = stored.findIndex(p => p.id === post.id);
         if(storedIdx !== -1) {
@@ -667,7 +752,7 @@ async function deletePost(post) {
         alert("Đã xóa bài viết thành công!");
     } catch (e) {
         console.error("Failed to delete post", e);
-        // post.splice(0, posts.length, ...originalPosts); // Revert if needed, but usually we just alert
+
         alert("Xóa thất bại, vui lòng thử lại sau.");
     }
     closePostMenu(post.id)
@@ -696,7 +781,7 @@ async function addComment(post) {
 async function deleteComment(post, commentId) {
     const list = post.comments || []
     const target = list.find(c => c.id === commentId)
-    // Allow if user is comment author OR user is post owner
+
     const isOwner = post.user === me.username
     const isAuthor = target && target.user === me.username
     if (!target || (!isAuthor && !isOwner)) return
@@ -714,18 +799,18 @@ async function deleteComment(post, commentId) {
 }
 
 
-// function displayedComments(post) {
-//     const expanded = !!commentExpanded[post.id]
-//     const list = post.comments || []
-//     if (expanded) return list
-//     const n = 2
-//     return list.slice(Math.max(0, list.length - n))
-// }
-//
-//
+
+
+
+
+
+
+
+
+
 function onScroll(e, postId) {
     const el = e.target;
-    // Calculate index based on scroll position
+
     const index = Math.round(el.scrollLeft / el.clientWidth);
     if (imageIndex[postId] !== index) {
         imageIndex[postId] = index;
@@ -740,14 +825,14 @@ function scrollCarousel(postId, direction) {
     }
 }
 
-// function showDeleteModal(post, comment) {
-//     deleteModal.show = true
-//     deleteModal.comment = comment
-//     deleteModal.post = post
-//     // Close menu
-//     const map = commentMenuOpen[post.id] || {}
-//     commentMenuOpen[post.id] = { ...map, [comment.id]: false }
-// }
+
+
+
+
+
+
+
+
 
 function closeDeleteModal() {
     deleteModal.show = false
@@ -781,6 +866,77 @@ function timeAgo(ts) {
     const d = Math.floor(h / 24)
     return `${d} ngày trước`
 }
+
+// User Menu Actions
+function toggleUserMenu() {
+    showUserMenu.value = !showUserMenu.value;
+}
+
+function logout() {
+    const ok = window.confirm("Bạn có chắc chắn muốn đăng xuất?");
+    if (!ok) return;
+
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('userAvatar');
+    router.push({ name: 'Login' });
+}
+
+function openChangePasswordModal() {
+    showUserMenu.value = false;
+    changePassForm.current = '';
+    changePassForm.new = '';
+    changePassForm.confirm = '';
+    changePassForm.error = '';
+    
+    showPass.current = false;
+    showPass.new = false;
+    showPass.confirm = false;
+    
+    changePasswordModal.show = true;
+}
+
+function closeChangePasswordModal() {
+    changePasswordModal.show = false;
+}
+
+async function submitChangePassword() {
+    changePassForm.error = '';
+    if (!changePassForm.current || !changePassForm.new || !changePassForm.confirm) {
+        changePassForm.error = 'Vui lòng điền đầy đủ thông tin.';
+        return;
+    }
+    if (changePassForm.new !== changePassForm.confirm) {
+        changePassForm.error = 'Mật khẩu mới không khớp.';
+        return;
+    }
+    if (!me.id) {
+        changePassForm.error = 'Không tìm thấy thông tin người dùng.';
+        return;
+    }
+
+    try {
+        // Verify current password
+        const res = await api.get(`/users/${me.id}`);
+        const user = res.data;
+        if (!user || user.password !== changePassForm.current) {
+            changePassForm.error = 'Mật khẩu hiện tại không đúng.';
+            return;
+        }
+
+        // Update password
+        await api.patch(`/users/${me.id}`, { password: changePassForm.new });
+        
+        // Update local storage
+        user.password = changePassForm.new;
+        localStorage.setItem('currentUser', JSON.stringify(user));
+        
+        alert('Đổi mật khẩu thành công!');
+        closeChangePasswordModal();
+    } catch (err) {
+        console.error(err);
+        changePassForm.error = 'Đã có lỗi xảy ra.';
+    }
+}
 </script>
 
 <style scoped>
@@ -788,7 +944,7 @@ body {
     background: #fafafa;
 }
 
-/* Stories ring */
+
 .story-ring {
     width: 72px;
     height: 72px;
